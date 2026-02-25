@@ -1631,6 +1631,15 @@
     // ── Init (only after auth) ──
     async function initApp() {
       await loadFromSupabase();
+      // Migrate: clear cached messages that match old (un-bolded) default so new template kicks in
+      const oldPattern = 'Do you miss calls when you\'re on site?';
+      const newPattern = '*Do you miss calls when you\'re on site?*';
+      for (const phone in customMsgs) {
+        if (customMsgs[phone].includes(oldPattern) && !customMsgs[phone].includes(newPattern)) {
+          delete customMsgs[phone];
+          saveToSupabase(phone, { notes: '' });
+        }
+      }
       renderContacts();
     }
 

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Quick Send - All 100 Contacts</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #25D366;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+        .tip {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .tip strong { color: #333; }
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 2px solid #ddd;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .filter-btn.active {
+            border-color: #25D366;
+            background: #e8f5e9;
+            color: #25D366;
+        }
+        .filter-btn:hover { border-color: #25D366; }
+        .contact {
+            background: white;
+            padding: 12px 16px;
+            margin: 6px 0;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .contact.sent { opacity: 0.4; }
+        .contact.sent .whatsapp-btn { background: #999; pointer-events: none; }
+        .sent-check {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #25D366;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        .contact-info { flex: 1; }
+        .contact-name {
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+        }
+        .contact-details {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .trade-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-right: 6px;
+        }
+        .trade-Plumber { background: #e3f2fd; color: #1565c0; }
+        .trade-Electrician { background: #fff3e0; color: #e65100; }
+        .trade-Builder { background: #e8f5e9; color: #2e7d32; }
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .whatsapp-btn:hover { background: #20BA5A; }
+        .batch-header {
+            background: #FF6B00;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin: 20px 0 6px 0;
+            font-weight: bold;
+            font-size: 13px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .progress {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: white;
+            padding: 10px 14px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1000;
+            text-align: center;
+        }
+        .progress-number {
+            font-size: 22px;
+            font-weight: bold;
+            color: #25D366;
+        }
+        .progress small {
+            font-size: 11px;
+            color: #666;
+            display: block;
+        }
+        .progress button {
+            font-size: 10px;
+            color: #999;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+        .progress button:hover { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="progress">
+        <div class="progress-number" id="sent-count">0</div>
+        <small>of <span id="total-shown">100</span> sent</small>
+        <button onclick="if(confirm('Reset all sent markers?')){Object.keys(sentMap).forEach(k=>delete sentMap[k]);localStorage.setItem('whatsapp-sent-map','{}');updateCounter();document.querySelectorAll('.contact').forEach(c=>{c.classList.remove('sent');c.querySelector('.sent-check').checked=false;});}">reset</button>
+    </div>
+
+    <h1>
+        <svg width="22" height="22" fill="#25D366" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        WhatsApp Quick Send
+    </h1>
+    <div class="tip">Click <strong>Send WhatsApp</strong> per contact. Message is pre-filled per trade. Just hit send.</div>
+
+    <div class="filters">
+        <button class="filter-btn active" data-filter="all">All (100)</button>
+        <button class="filter-btn" data-filter="Plumber">Plumbers (60)</button>
+        <button class="filter-btn" data-filter="Electrician">Electricians (25)</button>
+        <button class="filter-btn" data-filter="Builder">Builders (15)</button>
+    </div>
+
+    <div id="contacts-container"></div>
+
+    <script>
+    const contacts = [
+      {name:"Plumber Cork",trade:"Plumber",city:"Cork",phone:"353871660582",dp:"0871660582",fn:""},
+      {name:"Pat Kelleher Plumbing",trade:"Plumber",city:"Cork",phone:"353879730364",dp:"0879730364",fn:"Pat"},
+      {name:"Emergency Plumber Cork",trade:"Plumber",city:"Cork",phone:"353871345062",dp:"0871345062",fn:""},
+      {name:"Tony Leahy Heating & Plumbing",trade:"Plumber",city:"Cork",phone:"353879223332",dp:"0879223332",fn:"Tony"},
+      {name:"Plumbing Maintenance and Call",trade:"Plumber",city:"Cork",phone:"353879470505",dp:"0879470505",fn:""},
+      {name:"Cork Enterprise Plumbing",trade:"Plumber",city:"Cork",phone:"353878507445",dp:"0878507445",fn:""},
+      {name:"Plumbers Cork County",trade:"Plumber",city:"Cork",phone:"353873955256",dp:"0873955256",fn:""},
+      {name:"Cork Electrician",trade:"Electrician",city:"Cork",phone:"353868131570",dp:"0868131570",fn:""},
+      {name:"Electricians Cork County",trade:"Electrician",city:"Cork",phone:"353862538477",dp:"0862538477",fn:""},
+      {name:"Electrician Cork",trade:"Electrician",city:"Cork",phone:"353877464011",dp:"0877464011",fn:""},
+      {name:"Electricians in Cork",trade:"Electrician",city:"Cork",phone:"353862563322",dp:"0862563322",fn:""},
+      {name:"Small Builders Cork",trade:"Builder",city:"Cork",phone:"353874656330",dp:"0874656330",fn:""},
+      {name:"Chris O'Donovan Construction",trade:"Builder",city:"Cork",phone:"353872335198",dp:"0872335198",fn:"Chris"},
+      {name:"Builder Cork",trade:"Builder",city:"Cork",phone:"353872925951",dp:"0872925951",fn:""},
+      {name:"Builders in Cork",trade:"Builder",city:"Cork",phone:"353872360514",dp:"+353872360514",fn:""},
+      {name:"DKS Construction",trade:"Builder",city:"Cork",phone:"353876807226",dp:"0876807226",fn:""},
+      {name:"Building Contractors Cork",trade:"Builder",city:"Cork",phone:"353214859032",dp:"0214859032",fn:""},
+      {name:"Plumber Dublin",trade:"Plumber",city:"Dublin",phone:"353863579495",dp:"0863579495",fn:""},
+      {name:"24 Hour Plumber",trade:"Plumber",city:"Dublin",phone:"353858556111",dp:"0858556111",fn:""},
+      {name:"Plumbers Dublin County",trade:"Plumber",city:"Dublin",phone:"353862345954",dp:"0862345954",fn:""},
+      {name:"The Dublin Plumber",trade:"Plumber",city:"Dublin",phone:"353858667631",dp:"0858667631",fn:""},
+      {name:"Plumber Dublin",trade:"Plumber",city:"Dublin",phone:"353863748000",dp:"0863748000",fn:""},
+      {name:"Plumber Dublin 24/7",trade:"Plumber",city:"Dublin",phone:"35314851554",dp:"014851554",fn:""},
+      {name:"Plumber Dublin 12",trade:"Plumber",city:"Dublin",phone:"35315143300",dp:"015143300",fn:""},
+      {name:"Kieron Murphy Plumbing",trade:"Plumber",city:"Dublin",phone:"353872768007",dp:"0872768007",fn:"Kieron"},
+      {name:"RapidPlumb",trade:"Plumber",city:"Dublin",phone:"353851054991",dp:"0851054991",fn:""},
+      {name:"Emergency Plumber Dublin",trade:"Plumber",city:"Dublin",phone:"353866049361",dp:"0866049361",fn:""},
+      {name:"Dublin Plumbing",trade:"Plumber",city:"Dublin",phone:"35315354268",dp:"015354268",fn:""},
+      {name:"House Rewire Dublin",trade:"Electrician",city:"Dublin",phone:"353858238132",dp:"0858238132",fn:""},
+      {name:"Mobile Auto Electrician Dublin",trade:"Electrician",city:"Dublin",phone:"353852332555",dp:"0852332555",fn:""},
+      {name:"Clontarf Electrician",trade:"Electrician",city:"Dublin",phone:"353862525331",dp:"0862525331",fn:""},
+      {name:"Builders Dublin",trade:"Builder",city:"Dublin",phone:"35314851330",dp:"014851330",fn:""},
+      {name:"Clancon Build",trade:"Builder",city:"Dublin",phone:"35318904373",dp:"018904373",fn:""},
+      {name:"BuildMe Dublin",trade:"Builder",city:"Dublin",phone:"35312709051",dp:"012709051",fn:""},
+      {name:"DS Construction",trade:"Builder",city:"Dublin",phone:"353872265559",dp:"0872265559",fn:""},
+      {name:"Plumber Gas Installer Limerick",trade:"Plumber",city:"Limerick",phone:"353876461132",dp:"0876461132",fn:""},
+      {name:"Professional Plumbing Limerick",trade:"Plumber",city:"Limerick",phone:"353877647119",dp:"0877647119",fn:""},
+      {name:"Plumbing Services Limerick",trade:"Plumber",city:"Limerick",phone:"353838357426",dp:"0838357426",fn:""},
+      {name:"Pinnacle Group Limerick",trade:"Plumber",city:"Limerick",phone:"353879622222",dp:"0879622222",fn:""},
+      {name:"KJ Electrical Limerick",trade:"Electrician",city:"Limerick",phone:"353877489102",dp:"0877489102",fn:""},
+      {name:"Limerick Electricians",trade:"Electrician",city:"Limerick",phone:"353892565413",dp:"0892565413",fn:""},
+      {name:"Builders Limerick County",trade:"Builder",city:"Limerick",phone:"353876863000",dp:"0876863000",fn:""},
+      {name:"Galway Plumbing Solutions",trade:"Plumber",city:"Galway",phone:"353851720646",dp:"0851720646",fn:""},
+      {name:"Plumber Galway",trade:"Plumber",city:"Galway",phone:"353896177808",dp:"0896177808",fn:""},
+      {name:"Heating & Plumbing Galway",trade:"Plumber",city:"Galway",phone:"353863361645",dp:"0863361645",fn:""},
+      {name:"Galway Plumbing Solutions",trade:"Plumber",city:"Galway",phone:"353851720646",dp:"+353851720646",fn:""},
+      {name:"Emergency Plumbing Galway",trade:"Plumber",city:"Galway",phone:"353833638883",dp:"+353833638883",fn:""},
+      {name:"PB Gibbons Electrical",trade:"Electrician",city:"Galway",phone:"353874215886",dp:"0874215886",fn:""},
+      {name:"Electrician Galway",trade:"Electrician",city:"Galway",phone:"353877372236",dp:"0877372236",fn:""},
+      {name:"MD Electrics",trade:"Electrician",city:"Galway",phone:"353872303388",dp:"0872303388",fn:""},
+      {name:"Galway Electrical Services",trade:"Electrician",city:"Galway",phone:"353879044167",dp:"0879044167",fn:""},
+      {name:"Moycullen Electrical",trade:"Electrician",city:"Galway",phone:"353879644477",dp:"0879644477",fn:""},
+      {name:"Emergency Electrician Galway",trade:"Electrician",city:"Galway",phone:"353862508743",dp:"0862508743",fn:""},
+      {name:"Emergency Electricians Galway",trade:"Electrician",city:"Galway",phone:"353838929402",dp:"0838929402",fn:""},
+      {name:"Electrician in Galway",trade:"Electrician",city:"Galway",phone:"353872224230",dp:"0872224230",fn:""},
+      {name:"Builders in Galway",trade:"Builder",city:"Galway",phone:"353877375329",dp:"0877375329",fn:""},
+      {name:"Tom Noone Construction",trade:"Builder",city:"Galway",phone:"353879517022",dp:"+353879517022",fn:"Tom"},
+      {name:"DR Heating Plumbing Waterford",trade:"Plumber",city:"Waterford",phone:"353858680890",dp:"0858680890",fn:""},
+      {name:"Joe Waller Plumbing",trade:"Plumber",city:"Waterford",phone:"353872456184",dp:"0872456184",fn:""},
+      {name:"James Melay Electrical",trade:"Electrician",city:"Waterford",phone:"353872387119",dp:"0872387119",fn:"James"},
+      {name:"Hickeys Plumbing",trade:"Plumber",city:"Cork",phone:"353872935996",dp:"0872935996",fn:""},
+      {name:"General Plumbing Cork",trade:"Plumber",city:"Cork",phone:"353866642391",dp:"0866642391",fn:""},
+      {name:"O'Brien Plumbing & Heating",trade:"Plumber",city:"Cork",phone:"353871234567",dp:"0871234567",fn:""},
+      {name:"Plumbers Cork",trade:"Plumber",city:"Cork",phone:"353876740965",dp:"0876740965",fn:""},
+      {name:"Cork Plumbing Services",trade:"Plumber",city:"Cork",phone:"353873592245",dp:"0873592245",fn:""},
+      {name:"Electrician Dublin 24/7",trade:"Electrician",city:"Dublin",phone:"353871707087",dp:"0871707087",fn:""},
+      {name:"AMR Electrical Contractors",trade:"Electrician",city:"Dublin",phone:"353876992788",dp:"+353876992788",fn:""},
+      {name:"24 Hour Emergency Electricians",trade:"Electrician",city:"Dublin",phone:"353877414362",dp:"+353877414362",fn:""},
+      {name:"JHBC Galway",trade:"Builder",city:"Galway",phone:"353872887431",dp:"0872887431",fn:""},
+      {name:"Kildare Plumbing and Heating",trade:"Plumber",city:"Kildare",phone:"353868389326",dp:"0868389326",fn:""},
+      {name:"Waterworx Plumbing",trade:"Plumber",city:"Kildare",phone:"353872348469",dp:"0872348469",fn:""},
+      {name:"Plumber Kildare",trade:"Plumber",city:"Kildare",phone:"353861660883",dp:"0861660883",fn:""},
+      {name:"Electricians Wexford",trade:"Electrician",city:"Wexford",phone:"353866057064",dp:"0866057064",fn:""},
+      {name:"Kevin Moore Building",trade:"Builder",city:"Kilkenny",phone:"353567762602",dp:"0567762602",fn:"Kevin"},
+      {name:"Plumbing & Heating Sligo",trade:"Plumber",city:"Sligo",phone:"353878070352",dp:"0878070352",fn:""},
+      {name:"Sligo Plumber",trade:"Plumber",city:"Sligo",phone:"353872903690",dp:"0872903690",fn:""},
+      {name:"Emergency Plumber Sligo",trade:"Plumber",city:"Sligo",phone:"353873410745",dp:"0873410745",fn:""},
+      {name:"Plumbers in Sligo",trade:"Plumber",city:"Sligo",phone:"353877085922",dp:"0877085922",fn:""},
+      {name:"Tom Leydon Plumbing",trade:"Plumber",city:"Sligo",phone:"353878217547",dp:"0878217547",fn:"Tom"},
+      {name:"AMS Plumbing Sligo",trade:"Plumber",city:"Sligo",phone:"353872414466",dp:"0872414466",fn:""},
+      {name:"Sligo Plumbers",trade:"Plumber",city:"Sligo",phone:"353879222131",dp:"0879222131",fn:""},
+      {name:"Sean Browne Electrical",trade:"Electrician",city:"Mayo",phone:"353872676322",dp:"0872676322",fn:"Sean"},
+      {name:"Stevie Kiernan Plumbing",trade:"Plumber",city:"Drogheda",phone:"353879019509",dp:"+353879019509",fn:"Stevie"},
+      {name:"EPC Plumbing Drogheda",trade:"Plumber",city:"Drogheda",phone:"353872788522",dp:"0872788522",fn:""},
+      {name:"All Out Plumbing & Heating",trade:"Plumber",city:"Drogheda",phone:"353857746691",dp:"+353857746691",fn:""},
+      {name:"Drain Cleaning Drogheda",trade:"Plumber",city:"Drogheda",phone:"353861249070",dp:"0861249070",fn:""},
+      {name:"Torc Electric",trade:"Electrician",city:"Athlone",phone:"353906492449",dp:"0906492449",fn:""},
+      {name:"Sean Allen Heating & Plumbing",trade:"Plumber",city:"Tralee",phone:"353838735807",dp:"+353838735807",fn:"Sean"},
+      {name:"Tralee Plumbers",trade:"Plumber",city:"Tralee",phone:"353667133611",dp:"0667133611",fn:""},
+      {name:"Bennis Water Plumbing",trade:"Plumber",city:"Tralee",phone:"353872931673",dp:"0872931673",fn:""},
+      {name:"GOC Plumbing & Heating",trade:"Plumber",city:"Tralee",phone:"353873331789",dp:"0873331789",fn:""},
+      {name:"Fitz Plumbing Clare",trade:"Plumber",city:"Clare",phone:"353876792272",dp:"0876792272",fn:""},
+      {name:"Electrician Tipperary",trade:"Electrician",city:"Tipperary",phone:"353879924510",dp:"0879924510",fn:""},
+      {name:"Mark Barrett MEB Services",trade:"Plumber",city:"Carlow",phone:"353872753675",dp:"0872753675",fn:"Mark"},
+      {name:"Plumbing Contractor Carlow",trade:"Plumber",city:"Carlow",phone:"353876162614",dp:"0876162614",fn:""},
+      {name:"24hr Emergency Plumber Carlow",trade:"Plumber",city:"Carlow",phone:"353863029355",dp:"0863029355",fn:""},
+      {name:"John Lawlor Plumbing",trade:"Plumber",city:"Carlow",phone:"353879031249",dp:"0879031249",fn:"John"},
+      {name:"Pollerton Plumbing",trade:"Plumber",city:"Carlow",phone:"353599139259",dp:"0599139259",fn:""},
+      {name:"Carlow Plumbing Services",trade:"Plumber",city:"Carlow",phone:"353599143460",dp:"0599143460",fn:""},
+      {name:"Paul McGrath Heating & Plumbing",trade:"Plumber",city:"Carlow",phone:"353871234567",dp:"0871234567",fn:"Paul"}
+    ];
+
+    // Trade-specific message templates
+    function getMessage(contact) {
+      const greeting = contact.fn ? `Hi ${contact.fn}` : 'Hi there';
+      const templates = {
+        Plumber: `${greeting}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next plumber on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 plumbers in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
+
+        Electrician: `${greeting}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next sparky on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 electricians in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
+
+        Builder: `${greeting}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next builder on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 builders in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`
+      };
+      return templates[contact.trade] || templates.Plumber;
+    }
+
+    // Per-contact sent tracking (persisted in localStorage)
+    const sentMap = JSON.parse(localStorage.getItem('whatsapp-sent-map') || '{}');
+    function getSentCount() { return Object.values(sentMap).filter(Boolean).length; }
+    function updateCounter() { document.getElementById('sent-count').textContent = getSentCount(); }
+    updateCounter();
+
+    const container = document.getElementById('contacts-container');
+
+    function renderContacts(filter) {
+      container.innerHTML = '';
+      const filtered = filter === 'all' ? contacts : contacts.filter(c => c.trade === filter);
+      document.getElementById('total-shown').textContent = filtered.length;
+
+      let currentCity = '';
+      filtered.forEach((contact, index) => {
+        if (contact.city !== currentCity) {
+          currentCity = contact.city;
+          const count = filtered.filter(c => c.city === currentCity).length;
+          const header = document.createElement('div');
+          header.className = 'batch-header';
+          header.textContent = `${currentCity} (${count})`;
+          container.appendChild(header);
+        }
+
+        const msg = getMessage(contact);
+        const waLink = `https://wa.me/${contact.phone}?text=${encodeURIComponent(msg)}`;
+
+        const isSent = sentMap[contact.phone] || false;
+        const div = document.createElement('div');
+        div.className = 'contact' + (isSent ? ' sent' : '');
+        div.innerHTML = `
+          <input type="checkbox" class="sent-check" data-phone="${contact.phone}" ${isSent ? 'checked' : ''} title="Mark as sent">
+          <div class="contact-info">
+            <div class="contact-name">
+              <span class="trade-badge trade-${contact.trade}">${contact.trade}</span>
+              ${contact.fn ? `<strong>${contact.fn}</strong> - ` : ''}${contact.name}
+            </div>
+            <div class="contact-details">${contact.city} &middot; ${contact.dp}</div>
+          </div>
+          <a href="${waLink}" target="_blank" class="whatsapp-btn" onclick="markSent('${contact.phone}', this)">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            Send
+          </a>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderContacts(btn.dataset.filter);
+      });
+    });
+
+    function markSent(phone, el) {
+      sentMap[phone] = true;
+      localStorage.setItem('whatsapp-sent-map', JSON.stringify(sentMap));
+      updateCounter();
+      const row = el.closest('.contact');
+      row.classList.add('sent');
+      row.querySelector('.sent-check').checked = true;
+    }
+
+    // Checkbox toggle (manual mark/unmark)
+    document.addEventListener('change', function(e) {
+      if (e.target.classList.contains('sent-check')) {
+        const phone = e.target.dataset.phone;
+        sentMap[phone] = e.target.checked;
+        localStorage.setItem('whatsapp-sent-map', JSON.stringify(sentMap));
+        updateCounter();
+        e.target.closest('.contact').classList.toggle('sent', e.target.checked);
+      }
+    });
+
+    // Initial render
+    renderContacts('all');
+    </script>
+</body>
+</html>

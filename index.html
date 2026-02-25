@@ -936,22 +936,51 @@
     ];
 
     // ── Message templates ──
-    function looksLikeRealBusiness(name) {
-      // Generic scraped titles typically: start with trade word, contain city names, or are directory-style
-      const genericPatterns = [
-        /^(plumber|plumbing|electrician|electricians|builder|builders|building|emergency|24 hour|small)\b/i,
-        /^(plumbers|contractors|heating)\b/i,
-        /\b(cork|dublin|galway|limerick|waterford|kilkenny|carlow|wexford|sligo|kerry|tipperary|mayo|meath|louth|wicklow|offaly|clare|donegal|laois|longford|westmeath|roscommon|cavan|monaghan|leitrim)\s*(county|city)?\s*$/i,
-        /\bgolden\s?pages\b/i,
-        /\bhotfrog\b/i,
-        /\bcounty\s*$/i,
-        /^(find|search|best|top|local|all|list)\b/i
-      ];
-      return !genericPatterns.some(p => p.test(name.trim()));
+    // Real business names extracted from each contact's website
+    const businessNames = {
+      "353871660582": "A Turner Plumbing",
+      "353871345062": "Gas Electrical Services",
+      "353879470505": "Crowley Plumbing",
+      "353868131570": "Cork Electricians",
+      "353877464011": "Cork Electrical",
+      "353874656330": "Forged Construction",
+      "353872925951": "Murty O'Sullivan Builders",
+      "353863748000": "Dublin Plumber 24hrs",
+      "35314851554": "Plumbers 247",
+      "35315143300": "Dewar Plumbers",
+      "353866049361": "Sid's Plumbing",
+      "353858238132": "Dublin Electricians",
+      "353862525331": "Christie Electrical",
+      "353876461132": "Gaswork",
+      "353838357426": "AR Construction",
+      "353833638883": "Galway Property Services",
+      "353862508743": "Martinon Electrical",
+      "353838929402": "Electrician Galway",
+      "353877375329": "FVG Construction",
+      "353858680890": "DR Heating & Plumbing",
+      "353866642391": "A Turner Plumbing",
+      "353871707087": "Robbie Burke Electrical",
+      "353877414362": "My Electrician",
+      "353872788522": "EPC Plumbing & Heating",
+      "353861249070": "Dublin Plumbing Services",
+      "353876792272": "Fitz Plumbing & Heating",
+      "353879924510": "Jobel Electrical"
+    };
+
+    function getBusinessName(c) {
+      // If we have a manually mapped business name, use it
+      if (businessNames[c.phone]) return businessNames[c.phone];
+      // If the name already looks like a real business (not a generic scraped title), use it
+      const generic = /^(plumber|plumbing|electrician|electricians|builder|builders|building|emergency|24 hour|24hr|small|house rewire|mobile auto|heating &|drain cleaning|general plumbing)\b/i;
+      const directory = /\b(goldenpages|hotfrog|constructionireland|findaplumber|goreyonline|locallife|esda\.ie|classifieds|chamber\.cork)/i;
+      if (directory.test(c.web)) return null;
+      if (generic.test(c.name) && !businessNames[c.phone]) return null;
+      return c.name;
     }
 
     function getDefaultMessage(c) {
-      const g = c.fn ? `Hi ${c.fn}` : (looksLikeRealBusiness(c.name) ? `Hi there at ${c.name}` : `Hi there`);
+      const bn = getBusinessName(c);
+      const g = c.fn ? `Hi ${c.fn}` : (bn ? `Hi there at ${bn}` : `Hi there`);
       const t = {
         Plumber: `${g}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next plumber on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 plumbers in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
         Electrician: `${g}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next sparky on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 electricians in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
@@ -1222,7 +1251,7 @@
             <div class="contact-info">
               <div class="contact-name">
                 <span class="trade-badge trade-${contact.trade}">${contact.trade}</span>
-                ${contact.fn ? `<strong>${contact.fn}</strong> &mdash; ` : ''}${contact.name}
+                ${contact.fn ? `<strong>${contact.fn}</strong> &mdash; ` : ''}${getBusinessName(contact) || contact.name}
                 ${status ? `<span class="status-pill status-${status}">${STATUS_LABELS[status] || status}</span>` : ''}
                 ${followDue ? `<span class="followup-badge">Follow up!</span>` : ''}
               </div>

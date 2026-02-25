@@ -3,87 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Quick Send - Ringvox Outreach</title>
+    <title>Ringvox Outreach Dashboard</title>
+    <link rel="icon" href="https://ringvox.co/images/brand/favicon-32.png" type="image/png">
     <style>
-        * { box-sizing: border-box; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            max-width: 960px;
-            margin: 20px auto;
-            padding: 0 20px;
-            background: #f5f5f5;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f0f13;
+            color: #e5e5e5;
+            min-height: 100vh;
         }
-        h1 {
-            color: #25D366;
+
+        /* ── Header ── */
+        .header {
+            background: linear-gradient(135deg, #18181b 0%, #1a1520 50%, #18181b 100%);
+            border-bottom: 1px solid rgba(249,115,22,0.15);
+            padding: 16px 24px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            backdrop-filter: blur(12px);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-area svg { flex-shrink: 0; }
+        .logo-text {
             font-size: 22px;
-            margin-bottom: 6px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fb923c, #f97316, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
         }
-        .tip { font-size: 13px; color: #666; margin-bottom: 12px; }
-        .tip strong { color: #333; }
-        .sync-status {
+        .logo-tagline {
             font-size: 11px;
-            padding: 3px 8px;
-            border-radius: 10px;
-            display: inline-block;
-            margin-left: 10px;
+            color: #9ca3af;
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
-        .sync-ok { background: #e8f5e9; color: #2e7d32; }
-        .sync-err { background: #fce4ec; color: #c62828; }
-        .sync-loading { background: #fff3e0; color: #e65100; }
+        .header-divider {
+            width: 1px;
+            height: 32px;
+            background: rgba(255,255,255,0.08);
+        }
+        .page-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #d1d5db;
+        }
+        .page-title span {
+            color: #f97316;
+        }
+
+        /* ── Stats bar ── */
+        .stats-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .stat-pill .num {
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .stat-sent .num { color: #22c55e; }
+        .stat-total .num { color: #f97316; }
+        .sync-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .sync-ok { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+        .sync-err { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+        .sync-loading { background: #f97316; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .sync-label { font-size: 10px; color: #6b7280; }
+
+        /* ── Main content ── */
+        .main {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ── Controls row ── */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 14px 8px 36px;
+            background: #1e1e24;
+            border: 1px solid #2a2a32;
+            border-radius: 8px;
+            color: #e5e5e5;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-box:focus { border-color: #f97316; }
+        .search-box::placeholder { color: #555; }
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+        .search-wrap svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+        }
+
         .filters {
             display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 6px;
             flex-wrap: wrap;
         }
         .filter-btn {
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 2px solid #ddd;
-            background: white;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .filter-btn.active { border-color: #25D366; background: #e8f5e9; color: #25D366; }
-        .filter-btn:hover { border-color: #25D366; }
-
-        .contact {
-            background: white;
-            padding: 12px 16px;
-            margin: 6px 0;
+            padding: 7px 14px;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #2a2a32;
+            background: #1e1e24;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ca3af;
+            transition: all 0.2s;
+            font-family: inherit;
         }
-        .contact.sent { opacity: 0.45; }
-        .contact.sent .whatsapp-btn { background: #999; pointer-events: none; }
-        .contact-row {
+        .filter-btn.active {
+            border-color: #f97316;
+            background: rgba(249,115,22,0.1);
+            color: #f97316;
+        }
+        .filter-btn:hover { border-color: #f97316; color: #d1d5db; }
+
+        /* ── Batch headers ── */
+        .batch-header {
+            background: linear-gradient(135deg, #f97316, #ef4444);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin: 24px 0 8px 0;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            position: sticky;
+            top: 57px;
+            z-index: 100;
             display: flex;
             align-items: center;
             gap: 8px;
         }
+        .batch-header svg { opacity: 0.7; }
+
+        /* ── Contact cards ── */
+        .contact {
+            background: #1a1a22;
+            border: 1px solid #2a2a32;
+            padding: 14px 16px;
+            margin: 6px 0;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+        .contact:hover { border-color: #3a3a44; }
+        .contact.sent {
+            opacity: 0.35;
+            border-color: #1e1e24;
+        }
+        .contact.sent .whatsapp-btn { background: #333; pointer-events: none; }
+        .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
         .sent-check {
-            width: 20px; height: 20px;
+            width: 18px; height: 18px;
             cursor: pointer;
-            accent-color: #25D366;
+            accent-color: #22c55e;
             flex-shrink: 0;
         }
         .contact-info { flex: 1; min-width: 0; }
-        .contact-name { font-weight: bold; font-size: 14px; color: #333; }
-        .contact-details { font-size: 12px; color: #888; margin-top: 2px; }
-        .contact-details a { color: #1565c0; text-decoration: none; }
-        .contact-details a:hover { text-decoration: underline; }
-        .trade-badge {
-            display: inline-block; font-size: 11px; font-weight: 600;
-            padding: 2px 8px; border-radius: 10px; margin-right: 6px;
+        .contact-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
         }
-        .trade-Plumber { background: #e3f2fd; color: #1565c0; }
-        .trade-Electrician { background: #fff3e0; color: #e65100; }
-        .trade-Builder { background: #e8f5e9; color: #2e7d32; }
+        .contact-name strong { color: #fb923c; font-weight: 700; }
+        .contact-details {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .contact-details a {
+            color: #60a5fa;
+            text-decoration: none;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        .contact-details a:hover { text-decoration: underline; color: #93bbfc; }
+
+        .trade-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .trade-Plumber { background: rgba(37,99,235,0.15); color: #60a5fa; }
+        .trade-Electrician { background: rgba(249,115,22,0.15); color: #fb923c; }
+        .trade-Builder { background: rgba(34,197,94,0.15); color: #4ade80; }
 
         .contact-actions {
             display: flex;
@@ -92,107 +266,177 @@
             flex-shrink: 0;
         }
         .whatsapp-btn {
-            background: #25D366; color: white; border: none;
-            padding: 8px 16px; border-radius: 6px; cursor: pointer;
-            font-size: 13px; font-weight: 600; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 6px;
-            transition: background 0.2s; white-space: nowrap;
-        }
-        .whatsapp-btn:hover { background: #20BA5A; }
-        .edit-btn {
-            background: none; border: 1px solid #ddd; border-radius: 6px;
-            padding: 7px 10px; cursor: pointer; font-size: 13px; color: #666;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             transition: all 0.2s;
+            white-space: nowrap;
+            font-family: inherit;
         }
-        .edit-btn:hover { border-color: #999; color: #333; }
-        .edit-btn.active { border-color: #1565c0; color: #1565c0; background: #e3f2fd; }
+        .whatsapp-btn:hover { background: #20BA5A; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,211,102,0.3); }
+        .edit-btn {
+            background: transparent;
+            border: 1px solid #2a2a32;
+            border-radius: 8px;
+            padding: 7px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #6b7280;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .edit-btn:hover { border-color: #f97316; color: #f97316; }
+        .edit-btn.active { border-color: #f97316; color: #f97316; background: rgba(249,115,22,0.08); }
 
+        /* ── Message editor ── */
         .message-editor {
             display: none;
-            margin-top: 10px;
-            position: relative;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #2a2a32;
         }
         .message-editor.open { display: block; }
         .message-editor textarea {
             width: 100%;
             min-height: 180px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid #2a2a32;
+            border-radius: 8px;
             font-family: inherit;
             font-size: 13px;
-            line-height: 1.5;
+            line-height: 1.6;
             resize: vertical;
-            color: #333;
+            color: #e5e5e5;
+            background: #12121a;
+            outline: none;
+            transition: border-color 0.2s;
         }
-        .message-editor textarea:focus { border-color: #25D366; outline: none; }
+        .message-editor textarea:focus { border-color: #f97316; }
         .editor-actions {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-top: 6px;
         }
-        .editor-actions small { color: #999; font-size: 11px; }
+        .editor-actions small { color: #6b7280; font-size: 11px; }
+        .editor-actions small.custom { color: #f97316; }
         .reset-msg-btn {
-            font-size: 11px; color: #999; background: none; border: none;
-            cursor: pointer; text-decoration: underline;
+            font-size: 11px;
+            color: #6b7280;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-decoration: underline;
+            font-family: inherit;
         }
-        .reset-msg-btn:hover { color: #666; }
+        .reset-msg-btn:hover { color: #ef4444; }
 
-        .batch-header {
-            background: #FF6B00; color: white;
-            padding: 8px 16px; border-radius: 6px;
-            margin: 20px 0 6px 0; font-weight: bold; font-size: 13px;
-            position: sticky; top: 0; z-index: 100;
+        /* ── Reset button ── */
+        .reset-all-btn {
+            font-size: 10px;
+            color: #4b5563;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
         }
-        .progress {
-            position: fixed; top: 15px; right: 15px;
-            background: white; padding: 10px 14px; border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; text-align: center;
+        .reset-all-btn:hover { color: #ef4444; }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            .header { flex-direction: column; gap: 10px; padding: 12px 16px; }
+            .stats-bar { width: 100%; justify-content: center; }
+            .header-divider { display: none; }
+            .main { padding: 12px; }
+            .contact-row { flex-wrap: wrap; }
+            .contact-actions { width: 100%; justify-content: flex-end; margin-top: 8px; }
         }
-        .progress-number { font-size: 22px; font-weight: bold; color: #25D366; }
-        .progress small { font-size: 11px; color: #666; display: block; }
-        .progress button {
-            font-size: 10px; color: #999; background: none;
-            border: none; cursor: pointer; margin-top: 4px;
-        }
-        .progress button:hover { color: #dc3545; }
     </style>
 </head>
 <body>
-    <div class="progress">
-        <div class="progress-number" id="sent-count">0</div>
-        <small>of <span id="total-shown">100</span> sent</small>
-        <button onclick="resetAll()">reset</button>
+    <!-- ── Header ── -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-area">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <defs>
+                        <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#f97316"/>
+                            <stop offset="50%" stop-color="#f45d2b"/>
+                            <stop offset="100%" stop-color="#d946a8"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="4" y="18" width="5.5" height="16" rx="2.75" fill="url(#bg)"/>
+                    <rect x="13" y="10" width="5.5" height="30" rx="2.75" fill="url(#bg)"/>
+                    <rect x="22" y="3" width="5.5" height="42" rx="2.75" fill="url(#bg)"/>
+                    <rect x="31" y="13" width="5.5" height="26" rx="2.75" fill="url(#bg)"/>
+                    <rect x="40" y="20" width="5.5" height="12" rx="2.75" fill="url(#bg)"/>
+                    <path d="M35 6 L36.2 9 L39.2 10.2 L36.2 11.4 L35 14.4 L33.8 11.4 L30.8 10.2 L33.8 9 Z" fill="#f97316" opacity="0.9"/>
+                    <path d="M42.5 15 L43.1 16.2 L44.5 16.8 L43.1 17.4 L42.5 18.6 L41.9 17.4 L40.5 16.8 L41.9 16.2 Z" fill="#fdba74" opacity="0.6"/>
+                </svg>
+                <div>
+                    <div class="logo-text">Ringvox</div>
+                    <div class="logo-tagline">AI Voice Agents. Always On.</div>
+                </div>
+            </div>
+            <div class="header-divider"></div>
+            <div class="page-title"><span>WhatsApp</span> Outreach</div>
+        </div>
+        <div class="stats-bar">
+            <div class="stat-pill stat-sent">
+                <span class="num" id="sent-count">0</span>
+                <span>sent</span>
+            </div>
+            <div class="stat-pill stat-total">
+                <span class="num" id="total-shown">100</span>
+                <span>contacts</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;">
+                <span class="sync-dot sync-loading" id="sync-dot"></span>
+                <span class="sync-label" id="sync-label">syncing</span>
+            </div>
+            <button class="reset-all-btn" onclick="resetAll()">reset all</button>
+        </div>
     </div>
 
-    <h1>
-        <svg width="22" height="22" fill="#25D366" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-        WhatsApp Quick Send
-        <span class="sync-status sync-loading" id="sync-badge">syncing...</span>
-    </h1>
-    <div class="tip">Click <strong>Send</strong> to open WhatsApp with pre-filled message. <strong>Edit</strong> to tweak a message before sending.</div>
+    <!-- ── Main ── -->
+    <div class="main">
+        <div class="controls">
+            <div class="search-wrap">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input type="text" class="search-box" id="search" placeholder="Search by name, city, or phone...">
+            </div>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="Plumber">Plumbers</button>
+                <button class="filter-btn" data-filter="Electrician">Electricians</button>
+                <button class="filter-btn" data-filter="Builder">Builders</button>
+            </div>
+        </div>
 
-    <div class="filters">
-        <button class="filter-btn active" data-filter="all">All (100)</button>
-        <button class="filter-btn" data-filter="Plumber">Plumbers (60)</button>
-        <button class="filter-btn" data-filter="Electrician">Electricians (25)</button>
-        <button class="filter-btn" data-filter="Builder">Builders (15)</button>
+        <div id="contacts-container"></div>
     </div>
-
-    <div id="contacts-container"></div>
 
     <script>
-    // ── Supabase config ──
-    const SUPABASE_URL = 'https://nantnllmvftqmrwjorqe.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hbnRubGxtdmZ0cW1yd2pvcnFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMzQyOTYsImV4cCI6MjA4NjkxMDI5Nn0.os0CptUMkUxRXLm3_EsJq9GimwGKtUSNZ9hiQ7cLNsU';
+    // ── Supabase ──
+    const SB_URL = 'https://nantnllmvftqmrwjorqe.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hbnRubGxtdmZ0cW1yd2pvcnFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMzQyOTYsImV4cCI6MjA4NjkxMDI5Nn0.os0CptUMkUxRXLm3_EsJq9GimwGKtUSNZ9hiQ7cLNsU';
 
     async function sbFetch(path, opts = {}) {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+      const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
         ...opts,
         headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'apikey': SB_KEY,
+          'Authorization': `Bearer ${SB_KEY}`,
           'Content-Type': 'application/json',
           'Prefer': 'return=representation',
           ...(opts.headers || {})
@@ -203,7 +447,7 @@
       return text ? JSON.parse(text) : null;
     }
 
-    // ── Contact data (with website URLs) ──
+    // ── Contacts ──
     const contacts = [
       {name:"Plumber Cork",trade:"Plumber",city:"Cork",phone:"353871660582",dp:"0871660582",fn:"",web:"https://aturnerplumbing.ie/"},
       {name:"Pat Kelleher Plumbing",trade:"Plumber",city:"Cork",phone:"353879730364",dp:"0879730364",fn:"Pat",web:"https://www.kelleherplumbing.ie/"},
@@ -276,7 +520,7 @@
       {name:"JHBC Galway",trade:"Builder",city:"Galway",phone:"353872887431",dp:"0872887431",fn:"",web:"https://www.jhbc.ie/contact/"},
       {name:"Kildare Plumbing and Heating",trade:"Plumber",city:"Kildare",phone:"353868389326",dp:"0868389326",fn:"",web:"https://esda.ie/listing/kildare-plumbing-and-heating/"},
       {name:"Waterworx Plumbing",trade:"Plumber",city:"Kildare",phone:"353872348469",dp:"0872348469",fn:"",web:"https://www.waterworx.ie/plumbing-services"},
-      {name:"Plumber Kildare",trade:"Plumber",city:"Kildare",phone:"353861660883",dp:"0861660883",fn:"",web:"https://www.reddit.com/r/AskIreland/comments/1817lbi/finding_a_proper_plumber_in_ireland/"},
+      {name:"Plumber Kildare",trade:"Plumber",city:"Kildare",phone:"353861660883",dp:"0861660883",fn:"",web:""},
       {name:"Electricians Wexford",trade:"Electrician",city:"Wexford",phone:"353866057064",dp:"0866057064",fn:"",web:"http://www.goreyonline.com/electricians.html"},
       {name:"Kevin Moore Building",trade:"Builder",city:"Kilkenny",phone:"353567762602",dp:"0567762602",fn:"Kevin",web:"https://www.kevinmooreltd.com/"},
       {name:"Plumbing & Heating Sligo",trade:"Plumber",city:"Sligo",phone:"353878070352",dp:"0878070352",fn:"",web:"https://plumberandheatingsligo.com/"},
@@ -308,20 +552,21 @@
     ];
 
     // ── Message templates ──
-    function getDefaultMessage(contact) {
-      const greeting = contact.fn ? `Hi ${contact.fn}` : 'Hi there';
-      const templates = {
-        Plumber: `${greeting}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next plumber on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 plumbers in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
-        Electrician: `${greeting}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next sparky on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 electricians in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
-        Builder: `${greeting}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next builder on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 builders in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`
+    function getDefaultMessage(c) {
+      const g = c.fn ? `Hi ${c.fn}` : `Hi there at ${c.name}`;
+      const t = {
+        Plumber: `${g}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next plumber on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 plumbers in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
+        Electrician: `${g}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next sparky on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 electricians in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
+        Builder: `${g}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next builder on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 builders in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`
       };
-      return templates[contact.trade] || templates.Plumber;
+      return t[c.trade] || t.Plumber;
     }
 
     // ── State ──
-    let sentMap = {};       // phone -> true
-    let customMsgs = {};    // phone -> custom message text
+    let sentMap = {};
+    let customMsgs = {};
     let currentFilter = 'all';
+    let searchTerm = '';
 
     // ── Supabase sync ──
     async function loadFromSupabase() {
@@ -331,79 +576,70 @@
           if (r.sent) sentMap[r.phone] = true;
           if (r.notes) customMsgs[r.phone] = r.notes;
         });
-        setBadge('synced', 'sync-ok');
+        setSync(true);
       } catch (e) {
-        console.error('Supabase load failed:', e);
-        // Fall back to localStorage
+        console.error('Load failed:', e);
         sentMap = JSON.parse(localStorage.getItem('wa-sent') || '{}');
         customMsgs = JSON.parse(localStorage.getItem('wa-msgs') || '{}');
-        setBadge('offline', 'sync-err');
+        setSync(false);
       }
     }
 
     async function saveToSupabase(phone, sent, customMsg) {
-      // Always save locally first (instant)
       if (sent !== undefined) {
-        if (sent) sentMap[phone] = true;
-        else delete sentMap[phone];
+        if (sent) sentMap[phone] = true; else delete sentMap[phone];
         localStorage.setItem('wa-sent', JSON.stringify(sentMap));
       }
       if (customMsg !== undefined) {
-        if (customMsg) customMsgs[phone] = customMsg;
-        else delete customMsgs[phone];
+        if (customMsg) customMsgs[phone] = customMsg; else delete customMsgs[phone];
         localStorage.setItem('wa-msgs', JSON.stringify(customMsgs));
       }
-
-      // Then sync to Supabase
       try {
-        const body = { phone };
-        if (sent !== undefined) {
-          body.sent = !!sent;
-          body.sent_at = sent ? new Date().toISOString() : null;
-        }
+        const body = { phone, updated_at: new Date().toISOString() };
+        if (sent !== undefined) { body.sent = !!sent; body.sent_at = sent ? new Date().toISOString() : null; }
         if (customMsg !== undefined) body.notes = customMsg || null;
-        body.updated_at = new Date().toISOString();
-
         await sbFetch('outreach_contacts', {
           method: 'POST',
           headers: { 'Prefer': 'return=representation,resolution=merge-duplicates' },
           body: JSON.stringify(body)
         });
       } catch (e) {
-        console.error('Supabase save failed:', e);
-        setBadge('offline', 'sync-err');
+        console.error('Save failed:', e);
+        setSync(false);
       }
     }
 
-    function setBadge(text, cls) {
-      const b = document.getElementById('sync-badge');
-      b.textContent = text;
-      b.className = 'sync-status ' + cls;
+    function setSync(ok) {
+      const dot = document.getElementById('sync-dot');
+      const lbl = document.getElementById('sync-label');
+      dot.className = 'sync-dot ' + (ok ? 'sync-ok' : 'sync-err');
+      lbl.textContent = ok ? 'synced' : 'offline';
     }
 
-    // ── Counter ──
+    // ── Helpers ──
     function getSentCount() { return Object.values(sentMap).filter(Boolean).length; }
     function updateCounter() { document.getElementById('sent-count').textContent = getSentCount(); }
-
-    // ── Get message for a contact (custom or default) ──
-    function getMsg(contact) {
-      return customMsgs[contact.phone] || getDefaultMessage(contact);
-    }
-
-    // ── Build WhatsApp link ──
-    function waLink(contact) {
-      // Strip trailing letter from phone for duplicate keys like 353851720646b
-      const cleanPhone = contact.phone.replace(/[a-z]$/i, '');
-      return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(getMsg(contact))}`;
+    function getMsg(c) { return customMsgs[c.phone] || getDefaultMessage(c); }
+    function waLink(c) {
+      const p = c.phone.replace(/[a-z]$/i, '');
+      return `https://wa.me/${p}?text=${encodeURIComponent(getMsg(c))}`;
     }
 
     // ── Render ──
     const container = document.getElementById('contacts-container');
 
-    function renderContacts(filter) {
-      currentFilter = filter;
+    function renderContacts() {
       container.innerHTML = '';
-      const filtered = filter === 'all' ? contacts : contacts.filter(c => c.trade === filter);
+      let filtered = currentFilter === 'all' ? [...contacts] : contacts.filter(c => c.trade === currentFilter);
+      if (searchTerm) {
+        const q = searchTerm.toLowerCase();
+        filtered = filtered.filter(c =>
+          c.name.toLowerCase().includes(q) ||
+          c.city.toLowerCase().includes(q) ||
+          c.dp.includes(q) ||
+          (c.fn && c.fn.toLowerCase().includes(q))
+        );
+      }
       document.getElementById('total-shown').textContent = filtered.length;
 
       let currentCity = '';
@@ -411,26 +647,27 @@
         if (contact.city !== currentCity) {
           currentCity = contact.city;
           const count = filtered.filter(c => c.city === currentCity).length;
-          const header = document.createElement('div');
-          header.className = 'batch-header';
-          header.textContent = `${currentCity} (${count})`;
-          container.appendChild(header);
+          const h = document.createElement('div');
+          h.className = 'batch-header';
+          h.innerHTML = `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> ${currentCity} (${count})`;
+          container.appendChild(h);
         }
 
         const isSent = sentMap[contact.phone] || false;
         const hasCustom = !!customMsgs[contact.phone];
-        const webHost = contact.web ? new URL(contact.web).hostname.replace('www.','') : '';
+        let webHost = '';
+        try { webHost = contact.web ? new URL(contact.web).hostname.replace('www.','') : ''; } catch(e) {}
 
         const div = document.createElement('div');
         div.className = 'contact' + (isSent ? ' sent' : '');
         div.dataset.phone = contact.phone;
         div.innerHTML = `
           <div class="contact-row">
-            <input type="checkbox" class="sent-check" data-phone="${contact.phone}" ${isSent ? 'checked' : ''} title="Mark as sent">
+            <input type="checkbox" class="sent-check" data-phone="${contact.phone}" ${isSent ? 'checked' : ''}>
             <div class="contact-info">
               <div class="contact-name">
                 <span class="trade-badge trade-${contact.trade}">${contact.trade}</span>
-                ${contact.fn ? `<strong>${contact.fn}</strong> - ` : ''}${contact.name}
+                ${contact.fn ? `<strong>${contact.fn}</strong> &mdash; ` : ''}${contact.name}
               </div>
               <div class="contact-details">
                 ${contact.city} &middot; ${contact.dp}${webHost ? ` &middot; <a href="${contact.web}" target="_blank" title="${contact.web}">${webHost}</a>` : ''}
@@ -447,7 +684,7 @@
           <div class="message-editor" id="editor-${contact.phone}">
             <textarea data-phone="${contact.phone}">${getMsg(contact)}</textarea>
             <div class="editor-actions">
-              <small>${hasCustom ? 'Custom message' : 'Default template'}</small>
+              <small class="${hasCustom ? 'custom' : ''}">${hasCustom ? 'Custom message' : 'Default template'}</small>
               <button class="reset-msg-btn" data-phone="${contact.phone}">Reset to default</button>
             </div>
           </div>
@@ -457,29 +694,30 @@
       updateCounter();
     }
 
-    // ── Event handlers ──
-
-    // Filter buttons
+    // ── Events ──
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderContacts(btn.dataset.filter);
+        currentFilter = btn.dataset.filter;
+        renderContacts();
       });
     });
 
-    // Checkbox toggle
+    document.getElementById('search').addEventListener('input', function() {
+      searchTerm = this.value;
+      renderContacts();
+    });
+
     document.addEventListener('change', function(e) {
       if (e.target.classList.contains('sent-check')) {
         const phone = e.target.dataset.phone;
-        const checked = e.target.checked;
-        e.target.closest('.contact').classList.toggle('sent', checked);
-        saveToSupabase(phone, checked, undefined);
+        e.target.closest('.contact').classList.toggle('sent', e.target.checked);
+        saveToSupabase(phone, e.target.checked, undefined);
         updateCounter();
       }
     });
 
-    // Send button click - auto-mark as sent
     document.addEventListener('click', function(e) {
       const btn = e.target.closest('.whatsapp-btn');
       if (btn) {
@@ -490,89 +728,62 @@
         saveToSupabase(phone, true, undefined);
         updateCounter();
       }
-    });
-
-    // Edit button toggle
-    document.addEventListener('click', function(e) {
       if (e.target.classList.contains('edit-btn')) {
         const phone = e.target.dataset.phone;
         const editor = document.getElementById('editor-' + phone);
-        const isOpen = editor.classList.toggle('open');
-        e.target.classList.toggle('active', isOpen || !!customMsgs[phone]);
+        editor.classList.toggle('open');
+        e.target.classList.toggle('active', editor.classList.contains('open') || !!customMsgs[phone]);
       }
-    });
-
-    // Textarea change - save custom message and update WhatsApp link
-    document.addEventListener('input', function(e) {
-      if (e.target.tagName === 'TEXTAREA' && e.target.dataset.phone) {
-        const phone = e.target.dataset.phone;
-        const contact = contacts.find(c => c.phone === phone);
-        const defaultMsg = getDefaultMessage(contact);
-        const newMsg = e.target.value;
-
-        if (newMsg === defaultMsg) {
-          delete customMsgs[phone];
-          saveToSupabase(phone, undefined, '');
-        } else {
-          customMsgs[phone] = newMsg;
-          // Debounced save
-          clearTimeout(e.target._saveTimeout);
-          e.target._saveTimeout = setTimeout(() => saveToSupabase(phone, undefined, newMsg), 800);
-        }
-
-        // Update the WhatsApp link immediately
-        const row = e.target.closest('.contact');
-        const waBtn = row.querySelector('.whatsapp-btn');
-        const cleanPhone = phone.replace(/[a-z]$/i, '');
-        waBtn.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(newMsg)}`;
-
-        // Update label
-        const label = row.querySelector('.editor-actions small');
-        label.textContent = newMsg === defaultMsg ? 'Default template' : 'Custom message';
-      }
-    });
-
-    // Reset to default message
-    document.addEventListener('click', function(e) {
       if (e.target.classList.contains('reset-msg-btn')) {
         const phone = e.target.dataset.phone;
         const contact = contacts.find(c => c.phone === phone);
-        const defaultMsg = getDefaultMessage(contact);
+        const msg = getDefaultMessage(contact);
         const editor = document.getElementById('editor-' + phone);
-        editor.querySelector('textarea').value = defaultMsg;
+        editor.querySelector('textarea').value = msg;
         delete customMsgs[phone];
         saveToSupabase(phone, undefined, '');
-
-        // Update WhatsApp link
         const row = editor.closest('.contact');
         const waBtn = row.querySelector('.whatsapp-btn');
-        const cleanPhone = phone.replace(/[a-z]$/i, '');
-        waBtn.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(defaultMsg)}`;
-
-        // Update label and edit button
+        waBtn.href = `https://wa.me/${phone.replace(/[a-z]$/i,'')}?text=${encodeURIComponent(msg)}`;
         editor.querySelector('.editor-actions small').textContent = 'Default template';
+        editor.querySelector('.editor-actions small').className = '';
         row.querySelector('.edit-btn').classList.remove('active');
       }
     });
 
-    // Reset all
+    document.addEventListener('input', function(e) {
+      if (e.target.tagName === 'TEXTAREA' && e.target.dataset.phone) {
+        const phone = e.target.dataset.phone;
+        const contact = contacts.find(c => c.phone === phone);
+        const def = getDefaultMessage(contact);
+        const val = e.target.value;
+        const isCustom = val !== def;
+
+        if (isCustom) customMsgs[phone] = val; else delete customMsgs[phone];
+        clearTimeout(e.target._t);
+        e.target._t = setTimeout(() => saveToSupabase(phone, undefined, isCustom ? val : ''), 800);
+
+        const row = e.target.closest('.contact');
+        row.querySelector('.whatsapp-btn').href = `https://wa.me/${phone.replace(/[a-z]$/i,'')}?text=${encodeURIComponent(val)}`;
+        const sm = row.querySelector('.editor-actions small');
+        sm.textContent = isCustom ? 'Custom message' : 'Default template';
+        sm.className = isCustom ? 'custom' : '';
+      }
+    });
+
     function resetAll() {
-      if (!confirm('Reset all sent markers and custom messages? This cannot be undone.')) return;
-      sentMap = {};
-      customMsgs = {};
+      if (!confirm('Reset all sent markers and custom messages?')) return;
+      sentMap = {}; customMsgs = {};
       localStorage.removeItem('wa-sent');
       localStorage.removeItem('wa-msgs');
-      // Clear Supabase
-      sbFetch('outreach_contacts', { method: 'DELETE', headers: { 'Prefer': '' } })
-        .then(() => sbFetch('outreach_contacts?sent=eq.true', { method: 'DELETE', headers: { 'Prefer': '' } }))
-        .catch(() => {});
-      renderContacts(currentFilter);
+      sbFetch('outreach_contacts', { method: 'DELETE', headers: { 'Prefer': '' } }).catch(() => {});
+      renderContacts();
     }
 
     // ── Init ──
-    (async function init() {
+    (async () => {
       await loadFromSupabase();
-      renderContacts('all');
+      renderContacts();
     })();
     </script>
 </body>

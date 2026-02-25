@@ -276,10 +276,10 @@
         }
         .contact:hover { border-color: #3a3a44; }
         .contact.sent {
-            opacity: 0.35;
-            border-color: #1e1e24;
+            opacity: 0.75;
+            border-left: 3px solid #25D366;
         }
-        .contact.sent .whatsapp-btn { background: #333; pointer-events: none; }
+        .contact.sent .whatsapp-btn { background: #333; }
         .contact-row {
             display: flex;
             align-items: center;
@@ -559,21 +559,21 @@
 
         /* ── Reply templates ── */
         .reply-templates-btn {
-            padding: 5px 10px;
+            padding: 6px 14px;
             border-radius: 6px;
-            border: 1px solid rgba(249,115,22,0.3);
-            background: rgba(249,115,22,0.08);
+            border: 1px solid #f97316;
+            background: #f97316;
             cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            color: #f97316;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
             transition: all 0.2s;
             font-family: inherit;
             display: inline-flex;
             align-items: center;
             gap: 4px;
         }
-        .reply-templates-btn:hover { background: rgba(249,115,22,0.15); border-color: #f97316; }
+        .reply-templates-btn:hover { background: #ea580c; border-color: #ea580c; }
         .reply-templates-panel {
             display: none;
             margin-top: 10px;

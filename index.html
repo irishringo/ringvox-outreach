@@ -980,7 +980,7 @@
 
     function getDefaultMessage(c) {
       const bn = getBusinessName(c);
-      const g = c.fn ? `Hi ${c.fn}` : (bn ? `Hi there at ${bn}` : `Hi there`);
+      const g = c.fn ? `Hi ${c.fn}` : (bn ? `Hi ${bn}` : `Hi`);
       const t = {
         Plumber: `${g}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next plumber on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 plumbers in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
         Electrician: `${g}, Colm here from Ringvox in Limerick.\n\nDo you miss calls when you're on site? Most callers won't leave a voicemail, they just ring the next sparky on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nWe're opening it up to 10 electricians in Ireland this week at \u20ac25/month (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,

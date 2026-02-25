@@ -68,7 +68,7 @@
             color: #f97316;
         }
 
-        /* ── Stats bar ── */
+        /* ── Stats bar (header) ── */
         .stats-bar {
             display: flex;
             align-items: center;
@@ -100,6 +100,46 @@
         .sync-loading { background: #f97316; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
         .sync-label { font-size: 10px; color: #6b7280; }
+
+        /* ── Dashboard stats row ── */
+        .dashboard-stats {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px 20px 0 20px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+        .dash-card {
+            background: #1a1a22;
+            border: 1px solid #2a2a32;
+            border-radius: 10px;
+            padding: 14px 12px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .dash-card:hover { border-color: #3a3a44; }
+        .dash-card .dash-num {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+        .dash-card .dash-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+        .dash-card.dash-sent .dash-num { background: linear-gradient(135deg, #22c55e, #16a34a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .dash-card.dash-rate .dash-num { background: linear-gradient(135deg, #f97316, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .dash-card.dash-interested .dash-num { color: #f97316; }
+        .dash-card.dash-booked .dash-num { color: #22c55e; }
+        .dash-card.dash-signedup .dash-num { color: #8b5cf6; }
+        .dash-card.dash-followup .dash-num { color: #fb923c; }
 
         /* ── Main content ── */
         .main {
@@ -168,6 +208,23 @@
         }
         .filter-btn:hover { border-color: #f97316; color: #d1d5db; }
 
+        .csv-btn {
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1px solid #2a2a32;
+            background: #1e1e24;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ca3af;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .csv-btn:hover { border-color: #22c55e; color: #22c55e; }
+
         /* ── Batch headers ── */
         .batch-header {
             background: linear-gradient(135deg, #f97316, #ef4444);
@@ -186,6 +243,27 @@
             gap: 8px;
         }
         .batch-header svg { opacity: 0.7; }
+        .batch-progress {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .batch-progress-bar {
+            width: 60px;
+            height: 6px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .batch-progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
 
         /* ── Contact cards ── */
         .contact {
@@ -259,6 +337,37 @@
         .trade-Electrician { background: rgba(249,115,22,0.15); color: #fb923c; }
         .trade-Builder { background: rgba(34,197,94,0.15); color: #4ade80; }
 
+        /* ── Status pill ── */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-none { background: rgba(107,114,128,0.15); color: #6b7280; }
+        .status-interested { background: rgba(249,115,22,0.15); color: #f97316; }
+        .status-call_booked { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .status-not_interested { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .status-signed_up { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+
+        /* ── Follow-up badge ── */
+        .followup-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(251,146,60,0.2);
+            color: #fb923c;
+            animation: pulse 2s infinite;
+        }
+
         .contact-actions {
             display: flex;
             gap: 6px;
@@ -297,14 +406,60 @@
         .edit-btn:hover { border-color: #f97316; color: #f97316; }
         .edit-btn.active { border-color: #f97316; color: #f97316; background: rgba(249,115,22,0.08); }
 
-        /* ── Message editor ── */
-        .message-editor {
+        /* ── Edit panel (message editor + response controls + notes) ── */
+        .edit-panel {
             display: none;
             margin-top: 12px;
             padding-top: 12px;
             border-top: 1px solid #2a2a32;
         }
-        .message-editor.open { display: block; }
+        .edit-panel.open { display: block; }
+
+        .edit-panel-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .edit-panel-controls label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .response-select {
+            padding: 5px 10px;
+            background: #12121a;
+            border: 1px solid #2a2a32;
+            border-radius: 6px;
+            color: #e5e5e5;
+            font-size: 12px;
+            font-family: inherit;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .response-select:focus { border-color: #f97316; }
+        .followup-input {
+            padding: 5px 10px;
+            background: #12121a;
+            border: 1px solid #2a2a32;
+            border-radius: 6px;
+            color: #e5e5e5;
+            font-size: 12px;
+            font-family: inherit;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .followup-input:focus { border-color: #f97316; }
+        .followup-input::-webkit-calendar-picker-indicator {
+            filter: invert(0.5);
+        }
+
         .message-editor textarea {
             width: 100%;
             min-height: 180px;
@@ -339,6 +494,103 @@
             font-family: inherit;
         }
         .reset-msg-btn:hover { color: #ef4444; }
+
+        /* ── Conversation notes ── */
+        .notes-section {
+            margin-top: 12px;
+        }
+        .notes-section label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .notes-textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 10px;
+            border: 1px solid #2a2a32;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            line-height: 1.5;
+            resize: vertical;
+            color: #e5e5e5;
+            background: #12121a;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .notes-textarea:focus { border-color: #f97316; }
+        .notes-textarea::placeholder { color: #4b5563; }
+
+        /* ── Reply templates ── */
+        .reply-templates-btn {
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(249,115,22,0.3);
+            background: rgba(249,115,22,0.08);
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            color: #f97316;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .reply-templates-btn:hover { background: rgba(249,115,22,0.15); border-color: #f97316; }
+        .reply-templates-panel {
+            display: none;
+            margin-top: 10px;
+            border: 1px solid #2a2a32;
+            border-radius: 8px;
+            background: #12121a;
+            overflow: hidden;
+        }
+        .reply-templates-panel.open { display: block; }
+        .reply-template-item {
+            padding: 10px 14px;
+            border-bottom: 1px solid #2a2a32;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .reply-template-item:last-child { border-bottom: none; }
+        .reply-template-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #f97316;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .reply-template-text {
+            font-size: 12px;
+            color: #d1d5db;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        .reply-copy-btn {
+            padding: 4px 10px;
+            border-radius: 5px;
+            border: 1px solid #2a2a32;
+            background: #1e1e24;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 600;
+            color: #9ca3af;
+            transition: all 0.2s;
+            font-family: inherit;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        .reply-copy-btn:hover { border-color: #22c55e; color: #22c55e; }
+        .reply-copy-btn.copied { border-color: #22c55e; color: #22c55e; }
 
         /* ── Reset button ── */
         .reset-all-btn {
@@ -411,14 +663,20 @@
         .app-content { display: none; }
 
         /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+        }
         @media (max-width: 640px) {
             .header { flex-direction: column; gap: 10px; padding: 12px 16px; }
             .stats-bar { width: 100%; justify-content: center; }
             .header-divider { display: none; }
             .main { padding: 12px; }
+            .dashboard-stats { padding: 12px 12px 0 12px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .contact-row { flex-wrap: wrap; }
             .contact-actions { width: 100%; justify-content: flex-end; margin-top: 8px; }
             .login-box { margin: 20px; padding: 30px 24px; }
+            .edit-panel-controls { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -499,6 +757,36 @@
         </div>
     </div>
 
+    <!-- ── Dashboard Stats ── -->
+    <div class="dashboard-stats">
+        <div class="stats-grid">
+            <div class="dash-card dash-sent">
+                <div class="dash-num" id="dash-sent">0</div>
+                <div class="dash-label">Total Sent</div>
+            </div>
+            <div class="dash-card dash-rate">
+                <div class="dash-num" id="dash-rate">0%</div>
+                <div class="dash-label">Response Rate</div>
+            </div>
+            <div class="dash-card dash-interested">
+                <div class="dash-num" id="dash-interested">0</div>
+                <div class="dash-label">Interested</div>
+            </div>
+            <div class="dash-card dash-booked">
+                <div class="dash-num" id="dash-booked">0</div>
+                <div class="dash-label">Calls Booked</div>
+            </div>
+            <div class="dash-card dash-signedup">
+                <div class="dash-num" id="dash-signedup">0</div>
+                <div class="dash-label">Signed Up</div>
+            </div>
+            <div class="dash-card dash-followup">
+                <div class="dash-num" id="dash-followup">0</div>
+                <div class="dash-label">Follow-ups Due</div>
+            </div>
+        </div>
+    </div>
+
     <!-- ── Main ── -->
     <div class="main">
         <div class="controls">
@@ -511,7 +799,12 @@
                 <button class="filter-btn" data-filter="Plumber">Plumbers</button>
                 <button class="filter-btn" data-filter="Electrician">Electricians</button>
                 <button class="filter-btn" data-filter="Builder">Builders</button>
+                <button class="filter-btn" data-filter="followup">Follow-ups Due</button>
             </div>
+            <button class="csv-btn" onclick="exportCSV()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+            </button>
         </div>
 
         <div id="contacts-container"></div>
@@ -653,42 +946,114 @@
       return t[c.trade] || t.Plumber;
     }
 
+    // ── Reply templates for follow-up conversations ──
+    const replyTemplates = [
+      {
+        label: '"Tell me more" response',
+        text: `Great question! Ringvox is an AI phone agent that answers your calls when you can't.\n\nIt sounds just like a real receptionist - takes the caller's name, number, and what they need. Then texts you the summary instantly so you can call them back.\n\nNo more missed jobs going to the competition. Want me to set you up with a free trial?`
+      },
+      {
+        label: '"How much?" response',
+        text: `It's \u20ac25/month for the launch price (normally \u20ac49). That covers unlimited calls answered 24/7.\n\nPlus there's a 30-day money-back guarantee - if it doesn't catch you at least one job, full refund, no questions.\n\nWant to give it a go?`
+      },
+      {
+        label: '"How does it work?" response',
+        text: `Dead simple - takes about 5 minutes to set up:\n\n1. You set your phone to divert to Ringvox when you're busy/on site\n2. Ringvox answers as your business ("Hello, [Your Business], how can I help?")\n3. Gets the caller's details and what they need\n4. Texts you the summary straight away\n5. You call them back when you're free\n\nThe caller thinks they spoke to your receptionist. Want me to get you started?`
+      },
+      {
+        label: '"Not interested" graceful close',
+        text: `No worries at all! If you ever change your mind or want to give it a try, the offer's there.\n\nBest of luck with the business. Cheers!`
+      },
+      {
+        label: '"Book a call" response',
+        text: `Brilliant! I'd love to walk you through it.\n\nWould tomorrow or Thursday work better for a quick 10-minute call? I'll show you exactly how it works and get you set up on the spot.\n\nWhat time suits you best?`
+      }
+    ];
+
     // ── State ──
     let sentMap = {};
     let customMsgs = {};
+    let responseStatusMap = {};
+    let followUpDateMap = {};
+    let conversationNotesMap = {};
     let currentFilter = 'all';
     let searchTerm = '';
+
+    // ── Status helpers ──
+    const STATUS_LABELS = {
+      '': 'No reply',
+      'interested': 'Interested',
+      'call_booked': 'Call booked',
+      'not_interested': 'Not interested',
+      'signed_up': 'Signed up'
+    };
+
+    function isFollowUpDue(phone) {
+      const d = followUpDateMap[phone];
+      if (!d) return false;
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const fDate = new Date(d + 'T00:00:00');
+      return fDate <= today;
+    }
+
+    function getFollowUpsDueCount() {
+      return contacts.filter(c => isFollowUpDue(c.phone)).length;
+    }
 
     // ── Supabase sync ──
     async function loadFromSupabase() {
       try {
-        const rows = await sbFetch('outreach_contacts?select=phone,sent,notes');
+        const rows = await sbFetch('outreach_contacts?select=phone,sent,notes,response_status,follow_up_date,conversation_notes');
         rows.forEach(r => {
           if (r.sent) sentMap[r.phone] = true;
           if (r.notes) customMsgs[r.phone] = r.notes;
+          if (r.response_status) responseStatusMap[r.phone] = r.response_status;
+          if (r.follow_up_date) followUpDateMap[r.phone] = r.follow_up_date;
+          if (r.conversation_notes) conversationNotesMap[r.phone] = r.conversation_notes;
         });
         setSync(true);
       } catch (e) {
         console.error('Load failed:', e);
         sentMap = JSON.parse(localStorage.getItem('wa-sent') || '{}');
         customMsgs = JSON.parse(localStorage.getItem('wa-msgs') || '{}');
+        responseStatusMap = JSON.parse(localStorage.getItem('wa-status') || '{}');
+        followUpDateMap = JSON.parse(localStorage.getItem('wa-followup') || '{}');
+        conversationNotesMap = JSON.parse(localStorage.getItem('wa-notes') || '{}');
         setSync(false);
       }
     }
 
-    async function saveToSupabase(phone, sent, customMsg) {
-      if (sent !== undefined) {
-        if (sent) sentMap[phone] = true; else delete sentMap[phone];
+    async function saveToSupabase(phone, fields) {
+      // Update local state and localStorage
+      if (fields.sent !== undefined) {
+        if (fields.sent) sentMap[phone] = true; else delete sentMap[phone];
         localStorage.setItem('wa-sent', JSON.stringify(sentMap));
       }
-      if (customMsg !== undefined) {
-        if (customMsg) customMsgs[phone] = customMsg; else delete customMsgs[phone];
+      if (fields.notes !== undefined) {
+        if (fields.notes) customMsgs[phone] = fields.notes; else delete customMsgs[phone];
         localStorage.setItem('wa-msgs', JSON.stringify(customMsgs));
       }
+      if (fields.response_status !== undefined) {
+        if (fields.response_status) responseStatusMap[phone] = fields.response_status; else delete responseStatusMap[phone];
+        localStorage.setItem('wa-status', JSON.stringify(responseStatusMap));
+      }
+      if (fields.follow_up_date !== undefined) {
+        if (fields.follow_up_date) followUpDateMap[phone] = fields.follow_up_date; else delete followUpDateMap[phone];
+        localStorage.setItem('wa-followup', JSON.stringify(followUpDateMap));
+      }
+      if (fields.conversation_notes !== undefined) {
+        if (fields.conversation_notes) conversationNotesMap[phone] = fields.conversation_notes; else delete conversationNotesMap[phone];
+        localStorage.setItem('wa-notes', JSON.stringify(conversationNotesMap));
+      }
+
       try {
         const body = { phone, updated_at: new Date().toISOString() };
-        if (sent !== undefined) { body.sent = !!sent; body.sent_at = sent ? new Date().toISOString() : null; }
-        if (customMsg !== undefined) body.notes = customMsg || null;
+        if (fields.sent !== undefined) { body.sent = !!fields.sent; body.sent_at = fields.sent ? new Date().toISOString() : null; }
+        if (fields.notes !== undefined) body.notes = fields.notes || null;
+        if (fields.response_status !== undefined) body.response_status = fields.response_status || null;
+        if (fields.follow_up_date !== undefined) body.follow_up_date = fields.follow_up_date || null;
+        if (fields.conversation_notes !== undefined) body.conversation_notes = fields.conversation_notes || null;
         await sbFetch('outreach_contacts', {
           method: 'POST',
           headers: { 'Prefer': 'return=representation,resolution=merge-duplicates' },
@@ -716,12 +1081,84 @@
       return `https://wa.me/${p}?text=${encodeURIComponent(getMsg(c))}`;
     }
 
+    // ── Dashboard stats ──
+    function updateDashboard() {
+      const sentCount = getSentCount();
+      const interested = Object.values(responseStatusMap).filter(s => s === 'interested').length;
+      const booked = Object.values(responseStatusMap).filter(s => s === 'call_booked').length;
+      const signedup = Object.values(responseStatusMap).filter(s => s === 'signed_up').length;
+      const responded = interested + booked + signedup + Object.values(responseStatusMap).filter(s => s === 'not_interested').length;
+      const rate = sentCount > 0 ? Math.round((responded / sentCount) * 100) : 0;
+      const followups = getFollowUpsDueCount();
+
+      document.getElementById('dash-sent').textContent = sentCount;
+      document.getElementById('dash-rate').textContent = rate + '%';
+      document.getElementById('dash-interested').textContent = interested;
+      document.getElementById('dash-booked').textContent = booked;
+      document.getElementById('dash-signedup').textContent = signedup;
+      document.getElementById('dash-followup').textContent = followups;
+    }
+
+    // ── CSV Export ──
+    function exportCSV() {
+      const headers = ['Name','Trade','City','Phone','Display Phone','First Name','Website','Sent','Sent At','Response Status','Follow-up Date','Conversation Notes','Custom Message'];
+      const rows = contacts.map(c => {
+        const isSent = sentMap[c.phone] || false;
+        return [
+          c.name,
+          c.trade,
+          c.city,
+          c.phone,
+          c.dp,
+          c.fn,
+          c.web,
+          isSent ? 'Yes' : 'No',
+          isSent ? (new Date()).toISOString().split('T')[0] : '',
+          responseStatusMap[c.phone] ? STATUS_LABELS[responseStatusMap[c.phone]] || responseStatusMap[c.phone] : 'No reply',
+          followUpDateMap[c.phone] || '',
+          conversationNotesMap[c.phone] || '',
+          customMsgs[c.phone] || ''
+        ];
+      });
+
+      const escape = (v) => {
+        const s = String(v || '');
+        if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+          return '"' + s.replace(/"/g, '""') + '"';
+        }
+        return s;
+      };
+
+      let csv = headers.map(escape).join(',') + '\n';
+      rows.forEach(row => {
+        csv += row.map(escape).join(',') + '\n';
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const today = new Date().toISOString().split('T')[0];
+      a.href = url;
+      a.download = `ringvox-outreach-${today}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
     // ── Render ──
     const container = document.getElementById('contacts-container');
 
     function renderContacts() {
       container.innerHTML = '';
-      let filtered = currentFilter === 'all' ? [...contacts] : contacts.filter(c => c.trade === currentFilter);
+      let filtered = [...contacts];
+
+      // Trade filter
+      if (currentFilter === 'followup') {
+        filtered = filtered.filter(c => isFollowUpDue(c.phone));
+      } else if (currentFilter !== 'all') {
+        filtered = filtered.filter(c => c.trade === currentFilter);
+      }
+
+      // Search filter
       if (searchTerm) {
         const q = searchTerm.toLowerCase();
         filtered = filtered.filter(c =>
@@ -737,17 +1174,30 @@
       filtered.forEach(contact => {
         if (contact.city !== currentCity) {
           currentCity = contact.city;
-          const count = filtered.filter(c => c.city === currentCity).length;
+          const cityContacts = filtered.filter(c => c.city === currentCity);
+          const count = cityContacts.length;
+          const citySent = cityContacts.filter(c => sentMap[c.phone]).length;
+          const pct = count > 0 ? Math.round((citySent / count) * 100) : 0;
           const h = document.createElement('div');
           h.className = 'batch-header';
-          h.innerHTML = `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> ${currentCity} (${count})`;
+          h.innerHTML = `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> ${currentCity} (${count})
+          <div class="batch-progress">
+            <span>${citySent}/${count} sent</span>
+            <div class="batch-progress-bar"><div class="batch-progress-fill" style="width:${pct}%"></div></div>
+          </div>`;
           container.appendChild(h);
         }
 
         const isSent = sentMap[contact.phone] || false;
         const hasCustom = !!customMsgs[contact.phone];
+        const status = responseStatusMap[contact.phone] || '';
+        const followDate = followUpDateMap[contact.phone] || '';
+        const cNotes = conversationNotesMap[contact.phone] || '';
+        const followDue = isFollowUpDue(contact.phone);
         let webHost = '';
         try { webHost = contact.web ? new URL(contact.web).hostname.replace('www.','') : ''; } catch(e) {}
+
+        const showReplyTemplates = status === 'interested' || status === 'call_booked' || status === 'signed_up';
 
         const div = document.createElement('div');
         div.className = 'contact' + (isSent ? ' sent' : '');
@@ -759,30 +1209,68 @@
               <div class="contact-name">
                 <span class="trade-badge trade-${contact.trade}">${contact.trade}</span>
                 ${contact.fn ? `<strong>${contact.fn}</strong> &mdash; ` : ''}${contact.name}
+                ${status ? `<span class="status-pill status-${status}">${STATUS_LABELS[status] || status}</span>` : ''}
+                ${followDue ? `<span class="followup-badge">Follow up!</span>` : ''}
               </div>
               <div class="contact-details">
-                ${contact.city} &middot; ${contact.dp}${webHost ? ` &middot; <a href="${contact.web}" target="_blank" title="${contact.web}">${webHost}</a>` : ''}
+                ${contact.city} &middot; ${contact.dp}${webHost ? ` &middot; <a href="${contact.web}" target="_blank" title="${contact.web}">${webHost}</a>` : ''}${followDate ? ` &middot; Follow-up: ${followDate}` : ''}
               </div>
             </div>
             <div class="contact-actions">
-              <button class="edit-btn${hasCustom ? ' active' : ''}" data-phone="${contact.phone}" title="Edit message">&#9998;</button>
+              <button class="edit-btn${hasCustom || status || followDate || cNotes ? ' active' : ''}" data-phone="${contact.phone}" title="Edit message">&#9998;</button>
               <a href="${waLink(contact)}" target="_blank" class="whatsapp-btn" data-phone="${contact.phone}">
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                 Send
               </a>
             </div>
           </div>
-          <div class="message-editor" id="editor-${contact.phone}">
-            <textarea data-phone="${contact.phone}">${getMsg(contact)}</textarea>
-            <div class="editor-actions">
-              <small class="${hasCustom ? 'custom' : ''}">${hasCustom ? 'Custom message' : 'Default template'}</small>
-              <button class="reset-msg-btn" data-phone="${contact.phone}">Reset to default</button>
+          <div class="edit-panel" id="panel-${contact.phone}">
+            <div class="edit-panel-controls">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <label>Status:</label>
+                <select class="response-select" data-phone="${contact.phone}">
+                  <option value=""${!status ? ' selected' : ''}>No reply</option>
+                  <option value="interested"${status === 'interested' ? ' selected' : ''}>Interested</option>
+                  <option value="call_booked"${status === 'call_booked' ? ' selected' : ''}>Call booked</option>
+                  <option value="not_interested"${status === 'not_interested' ? ' selected' : ''}>Not interested</option>
+                  <option value="signed_up"${status === 'signed_up' ? ' selected' : ''}>Signed up</option>
+                </select>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <label>Follow-up:</label>
+                <input type="date" class="followup-input" data-phone="${contact.phone}" value="${followDate}">
+              </div>
+              ${showReplyTemplates ? `<button class="reply-templates-btn" data-phone="${contact.phone}">Reply Templates</button>` : ''}
+            </div>
+            ${showReplyTemplates ? `
+            <div class="reply-templates-panel" id="replies-${contact.phone}">
+              ${replyTemplates.map((t, i) => `
+                <div class="reply-template-item">
+                  <div>
+                    <div class="reply-template-label">${t.label}</div>
+                    <div class="reply-template-text">${t.text}</div>
+                  </div>
+                  <button class="reply-copy-btn" data-template-idx="${i}">Copy</button>
+                </div>
+              `).join('')}
+            </div>` : ''}
+            <div class="message-editor">
+              <textarea data-phone="${contact.phone}" data-type="message">${getMsg(contact)}</textarea>
+              <div class="editor-actions">
+                <small class="${hasCustom ? 'custom' : ''}">${hasCustom ? 'Custom message' : 'Default template'}</small>
+                <button class="reset-msg-btn" data-phone="${contact.phone}">Reset to default</button>
+              </div>
+            </div>
+            <div class="notes-section">
+              <label>Conversation Notes</label>
+              <textarea class="notes-textarea" data-phone="${contact.phone}" data-type="notes" placeholder="Add notes about your conversation...">${cNotes}</textarea>
             </div>
           </div>
         `;
         container.appendChild(div);
       });
       updateCounter();
+      updateDashboard();
     }
 
     // ── Events ──
@@ -800,73 +1288,141 @@
       renderContacts();
     });
 
+    // Checkbox change (sent toggle)
     document.addEventListener('change', function(e) {
       if (e.target.classList.contains('sent-check')) {
         const phone = e.target.dataset.phone;
         e.target.closest('.contact').classList.toggle('sent', e.target.checked);
-        saveToSupabase(phone, e.target.checked, undefined);
+        saveToSupabase(phone, { sent: e.target.checked });
         updateCounter();
+        updateDashboard();
+      }
+      // Response status change
+      if (e.target.classList.contains('response-select')) {
+        const phone = e.target.dataset.phone;
+        const val = e.target.value;
+        saveToSupabase(phone, { response_status: val });
+        renderContacts();
+      }
+      // Follow-up date change
+      if (e.target.classList.contains('followup-input')) {
+        const phone = e.target.dataset.phone;
+        const val = e.target.value;
+        saveToSupabase(phone, { follow_up_date: val });
+        updateDashboard();
+        // Update follow-up badge and details line without full re-render
+        const contactEl = e.target.closest('.contact');
+        const nameEl = contactEl.querySelector('.contact-name');
+        const existingBadge = nameEl.querySelector('.followup-badge');
+        if (existingBadge) existingBadge.remove();
+        if (val && isFollowUpDue(phone)) {
+          const badge = document.createElement('span');
+          badge.className = 'followup-badge';
+          badge.textContent = 'Follow up!';
+          nameEl.appendChild(badge);
+        }
       }
     });
 
     document.addEventListener('click', function(e) {
+      // WhatsApp send button
       const btn = e.target.closest('.whatsapp-btn');
       if (btn) {
         const phone = btn.dataset.phone;
         const row = btn.closest('.contact');
         row.classList.add('sent');
         row.querySelector('.sent-check').checked = true;
-        saveToSupabase(phone, true, undefined);
+        saveToSupabase(phone, { sent: true });
         updateCounter();
+        updateDashboard();
       }
+      // Edit button toggle
       if (e.target.classList.contains('edit-btn')) {
         const phone = e.target.dataset.phone;
-        const editor = document.getElementById('editor-' + phone);
-        editor.classList.toggle('open');
-        e.target.classList.toggle('active', editor.classList.contains('open') || !!customMsgs[phone]);
+        const panel = document.getElementById('panel-' + phone);
+        panel.classList.toggle('open');
+        const hasData = !!customMsgs[phone] || !!responseStatusMap[phone] || !!followUpDateMap[phone] || !!conversationNotesMap[phone];
+        e.target.classList.toggle('active', panel.classList.contains('open') || hasData);
       }
+      // Reset message button
       if (e.target.classList.contains('reset-msg-btn')) {
         const phone = e.target.dataset.phone;
         const contact = contacts.find(c => c.phone === phone);
         const msg = getDefaultMessage(contact);
-        const editor = document.getElementById('editor-' + phone);
-        editor.querySelector('textarea').value = msg;
+        const panel = document.getElementById('panel-' + phone);
+        panel.querySelector('textarea[data-type="message"]').value = msg;
         delete customMsgs[phone];
-        saveToSupabase(phone, undefined, '');
-        const row = editor.closest('.contact');
+        saveToSupabase(phone, { notes: '' });
+        const row = panel.closest('.contact');
         const waBtn = row.querySelector('.whatsapp-btn');
         waBtn.href = `https://wa.me/${phone.replace(/[a-z]$/i,'')}?text=${encodeURIComponent(msg)}`;
-        editor.querySelector('.editor-actions small').textContent = 'Default template';
-        editor.querySelector('.editor-actions small').className = '';
-        row.querySelector('.edit-btn').classList.remove('active');
+        panel.querySelector('.editor-actions small').textContent = 'Default template';
+        panel.querySelector('.editor-actions small').className = '';
+        const hasData = !!responseStatusMap[phone] || !!followUpDateMap[phone] || !!conversationNotesMap[phone];
+        row.querySelector('.edit-btn').classList.toggle('active', hasData);
+      }
+      // Reply templates button
+      if (e.target.classList.contains('reply-templates-btn')) {
+        const phone = e.target.dataset.phone;
+        const repliesPanel = document.getElementById('replies-' + phone);
+        if (repliesPanel) repliesPanel.classList.toggle('open');
+      }
+      // Reply copy button
+      if (e.target.classList.contains('reply-copy-btn')) {
+        const idx = parseInt(e.target.dataset.templateIdx);
+        const template = replyTemplates[idx];
+        if (template) {
+          navigator.clipboard.writeText(template.text).then(() => {
+            e.target.textContent = 'Copied!';
+            e.target.classList.add('copied');
+            setTimeout(() => {
+              e.target.textContent = 'Copy';
+              e.target.classList.remove('copied');
+            }, 2000);
+          });
+        }
       }
     });
 
+    // Textarea input (message editor + conversation notes)
     document.addEventListener('input', function(e) {
       if (e.target.tagName === 'TEXTAREA' && e.target.dataset.phone) {
         const phone = e.target.dataset.phone;
-        const contact = contacts.find(c => c.phone === phone);
-        const def = getDefaultMessage(contact);
-        const val = e.target.value;
-        const isCustom = val !== def;
+        const type = e.target.dataset.type;
 
-        if (isCustom) customMsgs[phone] = val; else delete customMsgs[phone];
-        clearTimeout(e.target._t);
-        e.target._t = setTimeout(() => saveToSupabase(phone, undefined, isCustom ? val : ''), 800);
+        if (type === 'message') {
+          // Message editor
+          const contact = contacts.find(c => c.phone === phone);
+          const def = getDefaultMessage(contact);
+          const val = e.target.value;
+          const isCustom = val !== def;
 
-        const row = e.target.closest('.contact');
-        row.querySelector('.whatsapp-btn').href = `https://wa.me/${phone.replace(/[a-z]$/i,'')}?text=${encodeURIComponent(val)}`;
-        const sm = row.querySelector('.editor-actions small');
-        sm.textContent = isCustom ? 'Custom message' : 'Default template';
-        sm.className = isCustom ? 'custom' : '';
+          if (isCustom) customMsgs[phone] = val; else delete customMsgs[phone];
+          clearTimeout(e.target._t);
+          e.target._t = setTimeout(() => saveToSupabase(phone, { notes: isCustom ? val : '' }), 800);
+
+          const row = e.target.closest('.contact');
+          row.querySelector('.whatsapp-btn').href = `https://wa.me/${phone.replace(/[a-z]$/i,'')}?text=${encodeURIComponent(val)}`;
+          const sm = row.querySelector('.editor-actions small');
+          sm.textContent = isCustom ? 'Custom message' : 'Default template';
+          sm.className = isCustom ? 'custom' : '';
+        } else if (type === 'notes') {
+          // Conversation notes
+          const val = e.target.value;
+          clearTimeout(e.target._t);
+          e.target._t = setTimeout(() => saveToSupabase(phone, { conversation_notes: val }), 800);
+        }
       }
     });
 
     function resetAll() {
-      if (!confirm('Reset all sent markers and custom messages?')) return;
-      sentMap = {}; customMsgs = {};
+      if (!confirm('Reset all sent markers, custom messages, statuses, follow-ups, and notes?')) return;
+      sentMap = {}; customMsgs = {}; responseStatusMap = {}; followUpDateMap = {}; conversationNotesMap = {};
       localStorage.removeItem('wa-sent');
       localStorage.removeItem('wa-msgs');
+      localStorage.removeItem('wa-status');
+      localStorage.removeItem('wa-followup');
+      localStorage.removeItem('wa-notes');
       sbFetch('outreach_contacts', { method: 'DELETE', headers: { 'Prefer': '' } }).catch(() => {});
       renderContacts();
     }
@@ -878,8 +1434,6 @@
     }
 
     // ── Password Gate ──
-    // SHA-256 hash of the access code (so plaintext password isn't in source)
-    // Default code: "ringvox2026" — change by updating the hash below
     const ACCESS_HASH = 'b3b39830e6dfa2c385dbf6b059533641645cd9d13aaf02d2dced361e83957089';
 
     async function sha256(text) {

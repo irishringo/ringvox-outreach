@@ -1329,6 +1329,19 @@
           if (r.sequence_step != null) sequenceStepMap[r.phone] = r.sequence_step;
           if (r.sent_at && r.sent_at.startsWith(todayStr)) todaySendCount++;
         });
+        // Auto-heal: contacts with follow_up_date but no sequence_step get set to step 1
+        const lsSeq = JSON.parse(localStorage.getItem('wa-sequence') || '{}');
+        rows.forEach(r => {
+          if (r.sent && r.follow_up_date && (!sequenceStepMap[r.phone] || sequenceStepMap[r.phone] === 0)) {
+            // Check localStorage too before defaulting
+            if (lsSeq[r.phone] && lsSeq[r.phone] > 0) {
+              sequenceStepMap[r.phone] = lsSeq[r.phone];
+            } else if (!r.response_status || r.response_status === 'none' || r.response_status === '') {
+              sequenceStepMap[r.phone] = 1;
+            }
+          }
+        });
+        localStorage.setItem('wa-sequence', JSON.stringify(sequenceStepMap));
         setSync(true);
       } catch (e) {
         console.error('Load failed:', e);

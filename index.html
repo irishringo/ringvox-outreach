@@ -1237,9 +1237,9 @@
       const greeting = name ? `Hi ${name}` : 'Hi';
       const trade = { Plumber: 'plumber', Electrician: 'sparky', Builder: 'builder' }[contact.trade] || 'tradesperson';
       const messages = {
-        1: `${greeting}, just following up on my message \u2014 did you get a chance to look at Ringvox? Happy to answer any questions.\n\nColm`,
-        2: `${greeting}, quick thought \u2014 the average ${trade} loses \u20ac2,000+/month in missed calls. Ringvox catches those for \u20ac25/month. Worth a try?\n\nringvox.co/trades\n\nColm`,
-        3: `${greeting}, last message from me! If Ringvox isn't for you, no worries at all. But if you ever want to try it, the offer stands \u2014 \u20ac25/month, 30-day money-back.\n\nBest of luck!\nColm`
+        1: `${greeting}, just following up on my message. The reason I got in touch is that most tradespeople we speak to are losing 3-5 calls a week when they're on site. Those callers don't leave voicemails \u2014 they just ring the next ${trade} on Google.\n\nRingvox makes sure that doesn't happen. Happy to answer any questions if you'd like to know more.\n\nThank you, Colm`,
+        2: `${greeting}, just one more thought on Ringvox. It's not a voicemail \u2014 it's an AI receptionist that actually talks to your callers, takes their name, number, and what they need, then texts you the details straight away so you can call them back.\n\nIt means your customers are looked after even when you're busy, and you don't lose the job to a competitor.\n\nringvox.co/trades\n\nThank you, Colm`,
+        3: `${greeting}, last message from me. If Ringvox isn't for you, no problem at all. But if you'd like to try it, it takes about 5 minutes to set up, it's \u20ac25/month, and there's a full refund if it doesn't catch you a job in 30 days. Nothing to lose.\n\nBest of luck with the work, Colm`
       };
       return messages[step] || getDefaultMessage(contact);
     }

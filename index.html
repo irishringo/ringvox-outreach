@@ -1372,7 +1372,7 @@
         let webHost = '';
         try { webHost = contact.web ? new URL(contact.web).hostname.replace('www.','') : ''; } catch(e) {}
 
-        const showReplyTemplates = status === 'interested' || status === 'call_booked' || status === 'signed_up';
+        const showReplyTemplates = !!status;
 
         const div = document.createElement('div');
         div.className = 'contact' + (isSent ? ' sent' : '');

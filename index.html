@@ -460,6 +460,37 @@
             filter: invert(0.5);
         }
 
+        .wa-format-bar {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+        .wa-format-bar button {
+            padding: 4px 10px;
+            border-radius: 5px;
+            border: 1px solid #2a2a32;
+            background: #1e1e24;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .wa-format-bar button:hover {
+            background: #2a2a32;
+            color: #f97316;
+            border-color: #f97316;
+        }
+        .wa-format-bar .fmt-bold { font-weight: 700; }
+        .wa-format-bar .fmt-italic { font-style: italic; }
+        .wa-format-bar .fmt-strike { text-decoration: line-through; }
+        .wa-format-bar .fmt-mono { font-family: monospace; letter-spacing: 0.5px; }
+        .wa-format-hint {
+            font-size: 10px;
+            color: #6b7280;
+            margin-left: auto;
+            align-self: center;
+        }
         .message-editor textarea {
             width: 100%;
             min-height: 180px;
@@ -1399,6 +1430,13 @@
               `).join('')}
             </div>` : ''}
             <div class="message-editor">
+              <div class="wa-format-bar">
+                <button class="fmt-bold" data-wrap="*" title="Bold *text*">B</button>
+                <button class="fmt-italic" data-wrap="_" title="Italic _text_">I</button>
+                <button class="fmt-strike" data-wrap="~" title="Strikethrough ~text~">S</button>
+                <button class="fmt-mono" data-wrap="\`\`\`" title="Monospace \`\`\`text\`\`\`">&lt;/&gt;</button>
+                <span class="wa-format-hint">Select text then click to format</span>
+              </div>
               <textarea data-phone="${contact.phone}" data-type="message">${getMsg(contact)}</textarea>
               <div class="editor-actions">
                 <small class="${hasCustom ? 'custom' : ''}">${hasCustom ? 'Custom message' : 'Default template'}</small>
@@ -1504,6 +1542,25 @@
         panel.querySelector('.editor-actions small').className = '';
         const hasData = !!responseStatusMap[phone] || !!followUpDateMap[phone] || !!conversationNotesMap[phone];
         row.querySelector('.edit-btn').classList.toggle('active', hasData);
+      }
+      // WhatsApp format buttons
+      if (e.target.dataset.wrap) {
+        const wrap = e.target.dataset.wrap;
+        const editor = e.target.closest('.message-editor');
+        const ta = editor.querySelector('textarea[data-type="message"]');
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        if (start === end) return; // nothing selected
+        const before = ta.value.substring(0, start);
+        const selected = ta.value.substring(start, end);
+        const after = ta.value.substring(end);
+        ta.value = before + wrap + selected + wrap + after;
+        // Re-select the wrapped text (including markers)
+        ta.selectionStart = start;
+        ta.selectionEnd = end + wrap.length * 2;
+        ta.focus();
+        // Trigger save
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
       }
       // Reply templates button
       if (e.target.classList.contains('reply-templates-btn')) {

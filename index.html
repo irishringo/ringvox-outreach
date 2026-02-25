@@ -779,6 +779,14 @@
         }
         .reply-use-btn:hover { background: #f97316; color: white; }
 
+        .campaign-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 4px; vertical-align: middle; }
+        .campaign-paid { background: rgba(156,163,175,0.2); color: #9ca3af; }
+        .campaign-free { background: rgba(34,197,94,0.2); color: #22c55e; }
+        .campaign-stats { display: flex; gap: 24px; padding: 8px 24px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; color: #9ca3af; }
+        .campaign-stats .cs-label { font-weight: 600; margin-right: 8px; }
+        .campaign-stats .cs-paid { color: #9ca3af; }
+        .campaign-stats .cs-free { color: #22c55e; }
+
         /* ── Responsive ── */
         @media (max-width: 768px) {
             .stats-grid { grid-template-columns: repeat(3, 1fr); }
@@ -908,6 +916,11 @@
         </div>
     </div>
 
+    <div class="campaign-stats" id="campaign-stats">
+        <div><span class="cs-label cs-paid">Paid:</span> <span id="cs-paid-sent">0</span> sent · <span id="cs-paid-rate">0%</span> response · <span id="cs-paid-int">0</span> interested</div>
+        <div><span class="cs-label cs-free">Free Trial:</span> <span id="cs-free-sent">0</span> sent · <span id="cs-free-rate">0%</span> response · <span id="cs-free-int">0</span> interested</div>
+    </div>
+
     <!-- ── Main ── -->
     <div class="main">
         <div class="controls">
@@ -921,6 +934,8 @@
                 <button class="filter-btn" data-filter="Electrician">Electricians</button>
                 <button class="filter-btn" data-filter="Builder">Builders</button>
                 <button class="filter-btn" data-filter="followup">Follow-ups Due</button>
+                <button class="filter-btn" data-filter="paid">Paid</button>
+                <button class="filter-btn" data-filter="free_trial">Free Trial</button>
             </div>
             <button class="csv-btn" onclick="exportCSV()">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1223,6 +1238,14 @@
     function getDefaultMessage(c) {
       const bn = getBusinessName(c);
       const g = c.fn ? `Hi ${c.fn}` : (bn ? `Hi ${bn}` : `Hi`);
+      if (campaignMap[c.phone] === 'free_trial') {
+        const ft = {
+          Plumber: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next plumber on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nI'd like to offer you a free 14-day trial \u2014 no card needed, no commitment. If it catches you even one job, it'll have paid for itself.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nThank you, Colm`,
+          Electrician: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next sparky on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nI'd like to offer you a free 14-day trial \u2014 no card needed, no commitment. If it catches you even one job, it'll have paid for itself.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nThank you, Colm`,
+          Builder: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next builder on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nI'd like to offer you a free 14-day trial \u2014 no card needed, no commitment. If it catches you even one job, it'll have paid for itself.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nThank you, Colm`
+        };
+        return ft[c.trade] || ft.Plumber;
+      }
       const t = {
         Plumber: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next plumber on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\n\u20ac25/month this week (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
         Electrician: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next sparky on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\n\u20ac25/month this week (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
@@ -1236,6 +1259,14 @@
       const name = contact.fn || getBusinessName(contact) || '';
       const greeting = name ? `Hi ${name}` : 'Hi';
       const trade = { Plumber: 'plumber', Electrician: 'sparky', Builder: 'builder' }[contact.trade] || 'tradesperson';
+      if (campaignMap[contact.phone] === 'free_trial') {
+        const freeMessages = {
+          1: `${greeting}, just following up on my message. The reason I got in touch is that most tradespeople we speak to are losing 3-5 calls a week when they're on site. Those callers don't leave voicemails \u2014 they just ring the next ${trade} on Google.\n\nRingvox makes sure that doesn't happen. The trial is completely free for 14 days, no strings attached.\n\nThank you, Colm`,
+          2: `${greeting}, just one more thought on Ringvox. It's not a voicemail \u2014 it's an AI receptionist that actually talks to your callers, takes their name, number, and what they need, then texts you the details straight away so you can call them back.\n\nYou can try it free for 14 days to see for yourself.\n\nringvox.co/trades\n\nThank you, Colm`,
+          3: `${greeting}, last message from me. If Ringvox isn't for you, no problem at all. But the free trial offer is still there \u2014 14 days, no card, takes 5 minutes to set up.\n\nBest of luck with the work, Colm`
+        };
+        return freeMessages[step] || getDefaultMessage(contact);
+      }
       const messages = {
         1: `${greeting}, just following up on my message. The reason I got in touch is that most tradespeople we speak to are losing 3-5 calls a week when they're on site. Those callers don't leave voicemails \u2014 they just ring the next ${trade} on Google.\n\nRingvox makes sure that doesn't happen. Happy to answer any questions if you'd like to know more.\n\nThank you, Colm`,
         2: `${greeting}, just one more thought on Ringvox. It's not a voicemail \u2014 it's an AI receptionist that actually talks to your callers, takes their name, number, and what they need, then texts you the details straight away so you can call them back.\n\nIt means your customers are looked after even when you're busy, and you don't lose the job to a competitor.\n\nringvox.co/trades\n\nThank you, Colm`,
@@ -1268,7 +1299,11 @@
         {
           label: '"Book a call" response',
           text: `Brilliant${n ? ',' + n : ''}! I'd love to walk you through it.\n\nWould tomorrow or Thursday work better for a quick 10-minute call? I'll show you exactly how it works and get you set up on the spot.\n\nWhat time suits you best?`
-        }
+        },
+        ...(campaignMap[contact.phone] === 'free_trial' ? [{
+          label: '"How much after?" response',
+          text: `After the 14-day trial it's \u20ac25/month, and you can cancel anytime. But let's get you set up first and see how it goes.\n\nThank you, Colm`
+        }] : [])
       ];
     }
 
@@ -1279,6 +1314,7 @@
     let followUpDateMap = {};
     let conversationNotesMap = {};
     let sequenceStepMap = {};
+    let campaignMap = {};
     let todaySendCount = 0;
     let currentFilter = 'all';
     let searchTerm = '';
@@ -1311,12 +1347,13 @@
       try {
         let rows;
         try {
-          rows = await sbFetch('outreach_contacts?select=phone,sent,sent_at,notes,response_status,follow_up_date,conversation_notes,sequence_step');
+          rows = await sbFetch('outreach_contacts?select=phone,sent,sent_at,notes,response_status,follow_up_date,conversation_notes,sequence_step,campaign');
         } catch (e) {
           // sequence_step column may not exist yet — retry without it
           console.warn('Loading without sequence_step column:', e.message);
           rows = await sbFetch('outreach_contacts?select=phone,sent,sent_at,notes,response_status,follow_up_date,conversation_notes');
           sequenceStepMap = JSON.parse(localStorage.getItem('wa-sequence') || '{}');
+          campaignMap = JSON.parse(localStorage.getItem('wa-campaign') || '{}');
         }
         const todayStr = new Date().toISOString().split('T')[0];
         todaySendCount = 0;
@@ -1327,6 +1364,7 @@
           if (r.follow_up_date) followUpDateMap[r.phone] = r.follow_up_date;
           if (r.conversation_notes) conversationNotesMap[r.phone] = r.conversation_notes;
           if (r.sequence_step != null) sequenceStepMap[r.phone] = r.sequence_step;
+          if (r.campaign) campaignMap[r.phone] = r.campaign;
           if (r.sent_at && r.sent_at.startsWith(todayStr)) todaySendCount++;
         });
         // Auto-heal: contacts with follow_up_date but no sequence_step get set to step 1
@@ -1342,6 +1380,7 @@
           }
         });
         localStorage.setItem('wa-sequence', JSON.stringify(sequenceStepMap));
+        localStorage.setItem('wa-campaign', JSON.stringify(campaignMap));
         setSync(true);
       } catch (e) {
         console.error('Load failed:', e);
@@ -1351,6 +1390,7 @@
         followUpDateMap = JSON.parse(localStorage.getItem('wa-followup') || '{}');
         conversationNotesMap = JSON.parse(localStorage.getItem('wa-notes') || '{}');
         sequenceStepMap = JSON.parse(localStorage.getItem('wa-sequence') || '{}');
+        campaignMap = JSON.parse(localStorage.getItem('wa-campaign') || '{}');
         setSync(false);
       }
     }
@@ -1381,6 +1421,10 @@
         sequenceStepMap[phone] = fields.sequence_step;
         localStorage.setItem('wa-sequence', JSON.stringify(sequenceStepMap));
       }
+      if (fields.campaign !== undefined) {
+        campaignMap[phone] = fields.campaign;
+        localStorage.setItem('wa-campaign', JSON.stringify(campaignMap));
+      }
 
       try {
         const body = { phone, updated_at: new Date().toISOString() };
@@ -1390,6 +1434,7 @@
         if (fields.follow_up_date !== undefined) body.follow_up_date = fields.follow_up_date || null;
         if (fields.conversation_notes !== undefined) body.conversation_notes = fields.conversation_notes || null;
         if (fields.sequence_step !== undefined) body.sequence_step = fields.sequence_step;
+        if (fields.campaign !== undefined) body.campaign = fields.campaign;
         try {
           await sbFetch('outreach_contacts', {
             method: 'POST',
@@ -1454,6 +1499,30 @@
       document.getElementById('dash-signedup').textContent = signedup;
       document.getElementById('dash-followup').textContent = followups;
 
+      // Campaign stats
+      let paidSent = 0, paidResponded = 0, paidInterested = 0;
+      let freeSent = 0, freeResponded = 0, freeInterested = 0;
+      contacts.forEach(c => {
+        const camp = campaignMap[c.phone] || 'paid';
+        const isSent = sentMap[c.phone];
+        const status = responseStatusMap[c.phone];
+        if (camp === 'free_trial') {
+          if (isSent) freeSent++;
+          if (status && status !== 'none') freeResponded++;
+          if (status === 'interested' || status === 'call_booked' || status === 'signed_up') freeInterested++;
+        } else {
+          if (isSent) paidSent++;
+          if (status && status !== 'none') paidResponded++;
+          if (status === 'interested' || status === 'call_booked' || status === 'signed_up') paidInterested++;
+        }
+      });
+      document.getElementById('cs-paid-sent').textContent = paidSent;
+      document.getElementById('cs-paid-rate').textContent = paidSent > 0 ? (paidResponded / paidSent * 100).toFixed(1) + '%' : '\u2014';
+      document.getElementById('cs-paid-int').textContent = paidInterested;
+      document.getElementById('cs-free-sent').textContent = freeSent;
+      document.getElementById('cs-free-rate').textContent = freeSent > 0 ? (freeResponded / freeSent * 100).toFixed(1) + '%' : '\u2014';
+      document.getElementById('cs-free-int').textContent = freeInterested;
+
       // Sent today counter
       const todayEl = document.getElementById('stat-today');
       document.getElementById('sent-today').textContent = todaySendCount;
@@ -1517,6 +1586,10 @@
       // Trade filter
       if (currentFilter === 'followup') {
         filtered = filtered.filter(c => isFollowUpDue(c.phone));
+      } else if (currentFilter === 'paid') {
+        filtered = filtered.filter(c => (campaignMap[c.phone] || 'paid') === 'paid');
+      } else if (currentFilter === 'free_trial') {
+        filtered = filtered.filter(c => campaignMap[c.phone] === 'free_trial');
       } else if (currentFilter !== 'all') {
         filtered = filtered.filter(c => c.trade === currentFilter);
       }
@@ -1576,7 +1649,7 @@
             <input type="checkbox" class="sent-check" data-phone="${contact.phone}" ${isSent ? 'checked' : ''}>
             <div class="contact-info">
               <div class="contact-name">
-                <span class="trade-badge trade-${contact.trade}">${contact.trade}</span>
+                <span class="trade-badge trade-${contact.trade}">${contact.trade}</span>${(campaignMap[contact.phone] || 'paid') === 'free_trial' ? '<span class="campaign-badge campaign-free">FREE</span>' : '<span class="campaign-badge campaign-paid">\u20ac25</span>'}
                 ${contact.fn ? `<strong>${contact.fn}</strong> &mdash; ` : ''}${getBusinessName(contact) || contact.name}
                 ${status ? `<span class="status-pill status-${status}">${STATUS_LABELS[status] || status}</span>` : ''}
                 ${seqBadge}
@@ -1892,13 +1965,14 @@
 
     function resetAll() {
       if (!confirm('Reset all sent markers, custom messages, statuses, follow-ups, and notes?')) return;
-      sentMap = {}; customMsgs = {}; responseStatusMap = {}; followUpDateMap = {}; conversationNotesMap = {}; sequenceStepMap = {}; todaySendCount = 0;
+      sentMap = {}; customMsgs = {}; responseStatusMap = {}; followUpDateMap = {}; conversationNotesMap = {}; sequenceStepMap = {}; campaignMap = {}; todaySendCount = 0;
       localStorage.removeItem('wa-sent');
       localStorage.removeItem('wa-msgs');
       localStorage.removeItem('wa-status');
       localStorage.removeItem('wa-followup');
       localStorage.removeItem('wa-notes');
       localStorage.removeItem('wa-sequence');
+      localStorage.removeItem('wa-campaign');
       sbFetch('outreach_contacts', { method: 'DELETE', headers: { 'Prefer': '' } }).catch(() => {});
       renderContacts();
     }

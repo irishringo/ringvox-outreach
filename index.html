@@ -1826,7 +1826,28 @@
         const wasAlreadySent = sentMap[phone];
         row.classList.add('sent');
         row.querySelector('.sent-check').checked = true;
-        saveToSupabase(phone, { sent: true });
+        // Auto-assign campaign for new sends (alternating 50/50)
+        if (!wasAlreadySent && !campaignMap[phone]) {
+          const paidCount = Object.values(campaignMap).filter(c => c === 'paid').length;
+          const freeCount = Object.values(campaignMap).filter(c => c === 'free_trial').length;
+          const assignedCampaign = freeCount <= paidCount ? 'free_trial' : 'paid';
+          campaignMap[phone] = assignedCampaign;
+          saveToSupabase(phone, { sent: true, campaign: assignedCampaign });
+          // Update badge and message to match assigned campaign
+          const contact = contacts.find(c => c.phone === phone);
+          if (contact) {
+            const badge = row.querySelector('.campaign-badge');
+            if (badge) {
+              badge.className = assignedCampaign === 'free_trial' ? 'campaign-badge campaign-free' : 'campaign-badge campaign-paid';
+              badge.textContent = assignedCampaign === 'free_trial' ? 'FREE' : '\u20ac25';
+            }
+            // Update the WhatsApp link with the correct campaign message
+            const waBtn2 = row.querySelector('.whatsapp-btn');
+            if (waBtn2) waBtn2.href = getWhatsAppUrl(contact);
+          }
+        } else {
+          saveToSupabase(phone, { sent: true });
+        }
         // First send: start sequence
         if (!wasAlreadySent && (!sequenceStepMap[phone] || sequenceStepMap[phone] === 0)) {
           scheduleFollowUp(phone, 1);

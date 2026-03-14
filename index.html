@@ -1964,7 +1964,10 @@
           const contact = contacts.find(c => c.phone === phone);
           const def = getDefaultMessage(contact);
           const val = e.target.value;
-          const isCustom = val !== def;
+          // Check against both default and current sequence message to avoid false "custom" saves
+          const step = sequenceStepMap[phone] || 0;
+          const seqMsg = (step > 0 && step < 99) ? getSequenceMessage(contact, step) : null;
+          const isCustom = val !== def && (!seqMsg || val !== seqMsg);
 
           if (isCustom) customMsgs[phone] = val; else delete customMsgs[phone];
           clearTimeout(e.target._t);

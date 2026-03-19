@@ -336,6 +336,7 @@
         .trade-Plumber { background: rgba(37,99,235,0.15); color: #60a5fa; }
         .trade-Electrician { background: rgba(249,115,22,0.15); color: #fb923c; }
         .trade-Builder { background: rgba(34,197,94,0.15); color: #4ade80; }
+        .trade-PropertyMgmt { background: rgba(168,85,247,0.15); color: #c084fc; }
 
         /* ── Status pill ── */
         .status-pill {
@@ -933,6 +934,7 @@
                 <button class="filter-btn" data-filter="Plumber">Plumbers</button>
                 <button class="filter-btn" data-filter="Electrician">Electricians</button>
                 <button class="filter-btn" data-filter="Builder">Builders</button>
+                <button class="filter-btn" data-filter="PropertyMgmt">Property Mgmt</button>
                 <button class="filter-btn" data-filter="followup">Follow-ups Due</button>
                 <button class="filter-btn" data-filter="paid">Paid</button>
                 <button class="filter-btn" data-filter="free_trial">Free Trial</button>
@@ -1189,7 +1191,26 @@
       {name:"NS Construction Ennis",trade:"Builder",city:"Ennis",phone:"353876608247",dp:"0876608247",fn:"Quinton",web:"https://www.nsconstruction.ie/"},
       {name:"ACE Electrical Mayo",trade:"Electrician",city:"Castlebar",phone:"353876123769",dp:"0876123769",fn:"Donal",web:"https://www.aceelectrical.ie/"},
       {name:"KHCL Construction",trade:"Builder",city:"Arklow",phone:"353402269110",dp:"0402269110",fn:"",web:"http://khclconstruction.ie/"},
-      {name:"Maurice Walsh Plumbing",trade:"Plumber",city:"Clonmel",phone:"353873669940",dp:"0873669940",fn:"Maurice",web:"https://www.mauricewalshplumbing.ie/"}
+      {name:"Maurice Walsh Plumbing",trade:"Plumber",city:"Clonmel",phone:"353873669940",dp:"0873669940",fn:"Maurice",web:"https://www.mauricewalshplumbing.ie/"},
+      // ── Property Management Companies (WhatsApp-reachable) ──
+      {name:"Able Property Services",trade:"PropertyMgmt",city:"Dublin",phone:"353872098526",dp:"0872098526",fn:"Linda",web:"http://www.ableproperty.ie/"},
+      {name:"Able Property Services",trade:"PropertyMgmt",city:"Dublin",phone:"353868260143",dp:"0868260143",fn:"Dave",web:"http://www.ableproperty.ie/"},
+      {name:"After Hours Property",trade:"PropertyMgmt",city:"Galway",phone:"353863567347",dp:"0863567347",fn:"",web:""},
+      {name:"UV Moore Property Management",trade:"PropertyMgmt",city:"Dublin",phone:"353868936144",dp:"0868936144",fn:"",web:"https://www.goldenpages.ie/uv-moore-property-management-dublin/"},
+      {name:"Loughview Solutions",trade:"PropertyMgmt",city:"Dublin",phone:"353862702418",dp:"0862702418",fn:"",web:"https://www.loughviewsolutions.ie/"},
+      {name:"Purple Property Management",trade:"PropertyMgmt",city:"Swords",phone:"353838091516",dp:"0838091516",fn:"",web:"https://purplepm.ie/"},
+      {name:"Property Management Clinic",trade:"PropertyMgmt",city:"Wexford",phone:"353872390392",dp:"0872390392",fn:"",web:""},
+      {name:"Property Management Clinic",trade:"PropertyMgmt",city:"Wexford",phone:"353838766119",dp:"0838766119",fn:"",web:""},
+      {name:"First Class Lettings",trade:"PropertyMgmt",city:"Dublin",phone:"353867929911",dp:"0867929911",fn:"",web:"https://www.firstclassletting.ie/"},
+      {name:"Ennis Gough Property",trade:"PropertyMgmt",city:"Waterford",phone:"353876790040",dp:"0876790040",fn:"David",web:"https://ennisgough.ie/"},
+      {name:"Tintean Home Locators",trade:"PropertyMgmt",city:"Swords",phone:"353851450311",dp:"0851450311",fn:"",web:""},
+      {name:"Fleming Real Estate",trade:"PropertyMgmt",city:"Dublin",phone:"353877933737",dp:"0877933737",fn:"",web:""},
+      {name:"Browns Estate Agents",trade:"PropertyMgmt",city:"Dublin",phone:"353873490727",dp:"0873490727",fn:"",web:""},
+      {name:"Letting Agent Donegal",trade:"PropertyMgmt",city:"Donegal",phone:"353873525295",dp:"0873525295",fn:"",web:""},
+      {name:"Cork PM Provider 1",trade:"PropertyMgmt",city:"Cork",phone:"353873143989",dp:"0873143989",fn:"",web:""},
+      {name:"Cork PM Provider 2",trade:"PropertyMgmt",city:"Cork",phone:"353833456080",dp:"0833456080",fn:"",web:""},
+      {name:"Cork PM Provider 3",trade:"PropertyMgmt",city:"Cork",phone:"353858353034",dp:"0858353034",fn:"",web:""},
+      {name:"Cork PM Provider 4",trade:"PropertyMgmt",city:"Cork",phone:"353868480455",dp:"0868480455",fn:"",web:""}
     ];
 
     // ── Message templates ──
@@ -1231,7 +1252,7 @@
       // If we have a manually mapped business name, use it
       if (businessNames[c.phone]) return businessNames[c.phone];
       // If the name already looks like a real business (not a generic scraped title), use it
-      const generic = /^(plumber|plumbing|electrician|electricians|builder|builders|building|emergency|24 hour|24hr|small|house rewire|mobile auto|heating &|drain cleaning|general plumbing)\b/i;
+      const generic = /^(plumber|plumbing|electrician|electricians|builder|builders|building|emergency|24 hour|24hr|small|house rewire|mobile auto|heating &|drain cleaning|general plumbing|letting agent|cork pm provider)\b/i;
       const directory = /\b(goldenpages|hotfrog|constructionireland|findaplumber|goreyonline|locallife|esda\.ie|classifieds|chamber\.cork)/i;
       if (directory.test(c.web)) return null;
       if (generic.test(c.name) && !businessNames[c.phone]) return null;
@@ -1245,14 +1266,16 @@
         const ft = {
           Plumber: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next plumber on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nI'd like to offer you a free 14-day trial \u2014 no card needed, no commitment. If it catches you even one job, it'll have paid for itself.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades/free-trial\n\nThank you, Colm`,
           Electrician: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next sparky on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nI'd like to offer you a free 14-day trial \u2014 no card needed, no commitment. If it catches you even one job, it'll have paid for itself.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades/free-trial\n\nThank you, Colm`,
-          Builder: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next builder on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nI'd like to offer you a free 14-day trial \u2014 no card needed, no commitment. If it catches you even one job, it'll have paid for itself.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades/free-trial\n\nThank you, Colm`
+          Builder: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next builder on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\nI'd like to offer you a free 14-day trial \u2014 no card needed, no commitment. If it catches you even one job, it'll have paid for itself.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades/free-trial\n\nThank you, Colm`,
+          PropertyMgmt: `${g}, Colm here from Ringvox in Limerick.\n\n*How do you handle tenant calls after hours?* Most tenants won't leave a voicemail \u2014 they'll ring the landlord directly or let the problem get worse.\n\nRingvox is an AI receptionist that answers your calls 24/7, triages the issue (emergency vs routine), collects the tenant's details, and texts you a summary straight away.\n\nI'd like to offer you a free 14-day trial \u2014 no card needed, no commitment. If it saves you even one after-hours headache, it'll have paid for itself.\n\nWant to try it? I can have you set up in 10 minutes.\n\nringvox.co\n\nThank you, Colm`
         };
         return ft[c.trade] || ft.Plumber;
       }
       const t = {
         Plumber: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next plumber on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\n\u20ac25/month this week (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
         Electrician: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next sparky on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\n\u20ac25/month this week (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
-        Builder: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next builder on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\n\u20ac25/month this week (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`
+        Builder: `${g}, Colm here from Ringvox in Limerick.\n\n*Do you miss calls when you're on site?* Most callers won't leave a voicemail, they just ring the next builder on Google.\n\nRingvox answers for you, gets their details, so they're waiting for your callback instead of calling someone else.\n\n\u20ac25/month this week (normally \u20ac49). Full refund if it doesn't catch you a job in 30 days.\n\nWant to try it? I can have you set up by Wednesday.\n\nringvox.co/trades\n\nCheers, Colm`,
+        PropertyMgmt: `${g}, Colm here from Ringvox in Limerick.\n\n*How do you handle tenant calls after hours?* Most tenants won't leave a voicemail \u2014 they'll ring the landlord directly or let the problem get worse.\n\nRingvox is an AI receptionist that answers your calls 24/7, triages the issue (emergency vs routine), collects the tenant's details, and texts you a summary straight away.\n\nFrom \u20ac200/month. If it doesn't save you time in the first 30 days, full refund.\n\nWant to try it? I can have you set up in 10 minutes.\n\nringvox.co\n\nCheers, Colm`
       };
       return t[c.trade] || t.Plumber;
     }
@@ -1261,7 +1284,16 @@
     function getSequenceMessage(contact, step) {
       const name = contact.fn || getBusinessName(contact) || '';
       const greeting = name ? `Hi ${name}` : 'Hi';
-      const trade = { Plumber: 'plumber', Electrician: 'sparky', Builder: 'builder' }[contact.trade] || 'tradesperson';
+      const trade = { Plumber: 'plumber', Electrician: 'sparky', Builder: 'builder', PropertyMgmt: 'letting agent' }[contact.trade] || 'tradesperson';
+      // Property Management specific follow-ups
+      if (contact.trade === 'PropertyMgmt') {
+        const pmMessages = {
+          1: `${greeting}, Colm here again from Ringvox. Sent you a message last week about our AI receptionist for property managers.\n\nQuick question \u2014 what happens when a tenant calls about a burst pipe at 11pm? If they get voicemail, they either ring the landlord directly or let the damage get worse.\n\nRingvox answers every call, triages the urgency, gets the details, and texts you a summary. You decide what needs immediate attention vs what can wait til morning.\n\nHappy to do a quick demo if you're curious.\n\nCheers, Colm`,
+          2: `${greeting}, Colm again from Ringvox. One more thought \u2014 it's not a voicemail service. It's an AI receptionist that actually talks to your callers, figures out if it's an emergency or routine, collects their details, and texts you everything straight away.\n\nIt means tenants are looked after 24/7 and you only get woken up for real emergencies.\n\nringvox.co\n\nCheers, Colm`,
+          3: `${greeting}, last message from me. If Ringvox isn't for you, no problem at all. But if you'd like to try it, it takes 10 minutes to set up and there's a full refund if it doesn't save you time in the first 30 days.\n\nBest of luck, Colm`
+        };
+        return pmMessages[step] || getDefaultMessage(contact);
+      }
       if (campaignMap[contact.phone] === 'free_trial') {
         const freeMessages = {
           1: `${greeting}, Colm here again from Ringvox. Sent you a message last week.\n\nQuick question \u2014 do you have someone answering your phone when you're on a job? Most lads we talk to don't, and the caller just rings the next ${trade} on Google.\n\nRingvox answers for you, takes their details, and texts them straight to you. The free trial is still there \u2014 14 days, no card, takes 5 minutes to set up.\n\nNo pressure either way \u2014 just thought it was worth a follow-up.\n\nCheers, Colm`,
@@ -1652,7 +1684,7 @@
             <input type="checkbox" class="sent-check" data-phone="${contact.phone}" ${isSent ? 'checked' : ''}>
             <div class="contact-info">
               <div class="contact-name">
-                <span class="trade-badge trade-${contact.trade}">${contact.trade}</span>${(campaignMap[contact.phone] || 'paid') === 'free_trial' ? '<span class="campaign-badge campaign-free">FREE</span>' : '<span class="campaign-badge campaign-paid">\u20ac25</span>'}
+                <span class="trade-badge trade-${contact.trade}">${contact.trade === 'PropertyMgmt' ? 'PROPERTY MGMT' : contact.trade.toUpperCase()}</span>${contact.trade === 'PropertyMgmt' ? '<span class="campaign-badge campaign-paid">\u20ac200</span>' : ((campaignMap[contact.phone] || 'paid') === 'free_trial' ? '<span class="campaign-badge campaign-free">FREE</span>' : '<span class="campaign-badge campaign-paid">\u20ac25</span>')}
                 ${contact.fn ? `<strong>${contact.fn}</strong> &mdash; ` : ''}${getBusinessName(contact) || contact.name}
                 ${status ? `<span class="status-pill status-${status}">${STATUS_LABELS[status] || status}</span>` : ''}
                 ${seqBadge}

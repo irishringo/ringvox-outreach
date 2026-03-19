@@ -938,6 +938,7 @@
                 <button class="filter-btn" data-filter="followup">Follow-ups Due</button>
                 <button class="filter-btn" data-filter="paid">Paid</button>
                 <button class="filter-btn" data-filter="free_trial">Free Trial</button>
+                <button class="filter-btn" data-filter="unsent" style="border-color:#22c55e;color:#22c55e;">Unsent</button>
             </div>
             <button class="csv-btn" onclick="exportCSV()">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1676,6 +1677,8 @@
         filtered = filtered.filter(c => campaignMap[c.phone] === 'paid');
       } else if (currentFilter === 'free_trial') {
         filtered = filtered.filter(c => campaignMap[c.phone] === 'free_trial');
+      } else if (currentFilter === 'unsent') {
+        filtered = filtered.filter(c => !sentMap[c.phone]);
       } else if (currentFilter !== 'all') {
         filtered = filtered.filter(c => c.trade === currentFilter);
       }

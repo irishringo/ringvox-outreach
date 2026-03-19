@@ -918,8 +918,8 @@
     </div>
 
     <div class="campaign-stats" id="campaign-stats">
-        <div><span class="cs-label cs-paid">Paid:</span> <span id="cs-paid-sent">0</span> sent · <span id="cs-paid-rate">0%</span> response · <span id="cs-paid-int">0</span> interested</div>
-        <div><span class="cs-label cs-free">Free Trial:</span> <span id="cs-free-sent">0</span> sent · <span id="cs-free-rate">0%</span> response · <span id="cs-free-int">0</span> interested</div>
+        <div><span class="cs-label cs-paid" id="cs-paid-label">Paid:</span> <span id="cs-paid-sent">0</span> sent · <span id="cs-paid-rate">0%</span> response · <span id="cs-paid-int">0</span> interested</div>
+        <div><span class="cs-label cs-free" id="cs-free-label">Free Trial:</span> <span id="cs-free-sent">0</span> sent · <span id="cs-free-rate">0%</span> response · <span id="cs-free-int">0</span> interested</div>
     </div>
 
     <!-- ── Main ── -->
@@ -1587,17 +1587,20 @@
       document.getElementById('dash-followup').textContent = followups;
 
       // Campaign stats
-      let paidSent = 0, paidResponded = 0, paidInterested = 0;
-      let freeSent = 0, freeResponded = 0, freeInterested = 0;
+      let paidTotal = 0, paidSent = 0, paidResponded = 0, paidInterested = 0;
+      let freeTotal = 0, freeSent = 0, freeResponded = 0, freeInterested = 0;
       contacts.forEach(c => {
+        if (c.trade === 'PropertyMgmt') return;
         const camp = campaignMap[c.phone] || 'paid';
         const isSent = sentMap[c.phone];
         const status = responseStatusMap[c.phone];
         if (camp === 'free_trial') {
+          freeTotal++;
           if (isSent) freeSent++;
           if (status && status !== 'none') freeResponded++;
           if (status === 'interested' || status === 'call_booked' || status === 'signed_up') freeInterested++;
         } else {
+          paidTotal++;
           if (isSent) paidSent++;
           if (status && status !== 'none') paidResponded++;
           if (status === 'interested' || status === 'call_booked' || status === 'signed_up') paidInterested++;
@@ -1609,6 +1612,11 @@
       document.getElementById('cs-free-sent').textContent = freeSent;
       document.getElementById('cs-free-rate').textContent = freeSent > 0 ? (freeResponded / freeSent * 100).toFixed(1) + '%' : '\u2014';
       document.getElementById('cs-free-int').textContent = freeInterested;
+      // Show total allocated to each campaign
+      const paidLabel = document.getElementById('cs-paid-label');
+      const freeLabel = document.getElementById('cs-free-label');
+      if (paidLabel) paidLabel.textContent = `Paid (${paidTotal}):`;
+      if (freeLabel) freeLabel.textContent = `Free Trial (${freeTotal}):`;
 
       // Sent today counter
       const todayEl = document.getElementById('stat-today');
@@ -2094,14 +2102,18 @@
     async function initApp() {
       await loadFromSupabase();
       // Pre-assign all unassigned contacts evenly between paid and free_trial
+      // Shuffle unassigned so the split isn't grouped by city/trade
       const unassigned = contacts.filter(c => !campaignMap[c.phone] && c.trade !== 'PropertyMgmt');
       if (unassigned.length > 0) {
-        let paidCount = Object.values(campaignMap).filter(c => c === 'paid').length;
-        let freeCount = Object.values(campaignMap).filter(c => c === 'free_trial').length;
-        unassigned.forEach(c => {
-          const assigned = freeCount <= paidCount ? 'free_trial' : 'paid';
-          campaignMap[c.phone] = assigned;
-          if (assigned === 'free_trial') freeCount++; else paidCount++;
+        // Simple shuffle
+        for (let i = unassigned.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [unassigned[i], unassigned[j]] = [unassigned[j], unassigned[i]];
+        }
+        // Split exactly 50/50 (first half free_trial, second half paid)
+        const half = Math.ceil(unassigned.length / 2);
+        unassigned.forEach((c, idx) => {
+          campaignMap[c.phone] = idx < half ? 'free_trial' : 'paid';
         });
         localStorage.setItem('wa-campaign', JSON.stringify(campaignMap));
         // Persist to Supabase in background

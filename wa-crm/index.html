@@ -1,0 +1,450 @@
+<title>Ringvox WhatsApp Outreach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one phone-width column, the day's work first, tabs to switch job. Ringvox orange for the brand, WhatsApp green only on the send button. */
+:root{
+  --bg:#f7f5f2; --surface:#ffffff; --sunk:#efebe6; --fg:#1d1a17; --muted:#6e6760; --line:#e2dcd4;
+  --accent:#e8542a; --accent-ink:#ffffff; --accent-soft:#fde9e1;
+  --wa:#1fa855; --wa-ink:#ffffff; --wa-soft:#e2f5e9;
+  --good:#1f8a4c; --warn:#b26a00; --warn-soft:#fff2db; --bad:#c23a2b; --bad-soft:#fbe6e3;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141210; --surface:#1e1b18; --sunk:#262220; --fg:#f1ece6; --muted:#a69d94; --line:#352f2b;
+  --accent:#ff7a4d; --accent-ink:#1a0e08; --accent-soft:#3a2219;
+  --wa:#2fc76a; --wa-ink:#06180d; --wa-soft:#15301f;
+  --good:#4fc47e; --warn:#f0b04a; --warn-soft:#3a2c12; --bad:#ff7b6b; --bad-soft:#3b1d19; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141210; --surface:#1e1b18; --sunk:#262220; --fg:#f1ece6; --muted:#a69d94; --line:#352f2b;
+  --accent:#ff7a4d; --accent-ink:#1a0e08; --accent-soft:#3a2219;
+  --wa:#2fc76a; --wa-ink:#06180d; --wa-soft:#15301f;
+  --good:#4fc47e; --warn:#f0b04a; --warn-soft:#3a2c12; --bad:#ff7b6b; --bad-soft:#3b1d19; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--f-body);padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:640px;margin:0 auto}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 8px;display:grid;gap:10px}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font:700 1.35rem/1.1 var(--f-display);margin:0;letter-spacing:-.01em}
+h1 span{color:var(--accent)}
+.date{color:var(--muted);font-size:.85rem}
+.meter{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--muted)}
+.bar{flex:1;height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--wa);border-radius:99px;transition:width .3s}
+.bar.over i{background:var(--warn)}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--fg)}
+nav{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:10px}
+nav button{flex:1;border:0;background:transparent;color:var(--muted);font:600 .88rem var(--f-body);padding:8px 4px;border-radius:7px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgb(0 0 0 / .08)}
+nav button .count{font-family:var(--f-mono);font-size:.75rem;margin-left:4px;color:var(--accent)}
+.banner{border-radius:var(--r);padding:12px 14px;font-size:.9rem;display:grid;gap:8px}
+.banner.err{background:var(--bad-soft);color:var(--fg);border:1px solid var(--bad)}
+.banner.info{background:var(--sunk)}
+.banner button{justify-self:start}
+section{display:grid;gap:12px;padding-top:10px}
+h2{font:700 1rem var(--f-display);margin:14px 0 0;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+h2 small{font:500 .8rem var(--f-body);color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:10px;min-width:0}
+.card.done{opacity:.6}
+.who{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.who b{font-weight:700;font-size:1rem}
+.who .meta{color:var(--muted);font-size:.84rem}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:.72rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--sunk);color:var(--muted)}
+.tag.step{background:var(--accent-soft);color:var(--accent)}
+.tag.prior{background:var(--warn-soft);color:var(--warn)}
+.tag.int{background:var(--wa-soft);color:var(--good)}
+.msg{background:var(--sunk);border-radius:10px;padding:10px 12px;white-space:pre-wrap;font-size:.9rem;min-width:0;overflow-wrap:anywhere}
+textarea,input[type=text],input[type=email],input[type=search],select{width:100%;font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+textarea{min-height:150px;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 .9rem var(--f-body);padding:9px 14px;border-radius:9px;cursor:pointer;text-decoration:none;min-height:42px}
+.btn:hover{border-color:var(--muted)}
+.btn.wa{background:var(--wa);border-color:var(--wa);color:var(--wa-ink);flex:1}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.quiet{border-color:transparent;background:transparent;color:var(--muted);padding-inline:8px}
+.btn:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.confirm{display:grid;gap:8px;background:var(--wa-soft);border-radius:10px;padding:10px 12px}
+.confirm p{margin:0;font-weight:600}
+.outcomes{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+.outcomes button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+details{border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;color:var(--muted);font-weight:600;font-size:.88rem}
+.tpl{display:grid;gap:6px;padding-top:8px}
+.tpl .msg{font-size:.85rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.stat .v{font:600 1.4rem var(--f-mono);font-variant-numeric:tabular-nums}
+.stat .k{color:var(--muted);font-size:.8rem}
+.empty{color:var(--muted);text-align:center;padding:28px 12px;border:1px dashed var(--line);border-radius:var(--r)}
+.note{color:var(--muted);font-size:.82rem}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:99px;font-size:.88rem;z-index:20}
+.sync{font-size:.8rem;color:var(--muted)}
+.sync.stale{color:var(--warn)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>Ringvox <span>WhatsApp</span></h1>
+      <span class="date" id="today">Loading…</span>
+    </div>
+    <div class="meter" aria-live="polite">
+      <span>Sent today <span class="num" id="sentToday">0</span> of <span class="num" id="cap">15</span></span>
+      <div class="bar" id="bar"><i style="width:0%"></i></div>
+    </div>
+    <nav role="tablist">
+      <button role="tab" id="tab-today" aria-selected="true" data-tab="today">Today<span class="count" id="c-today"></span></button>
+      <button role="tab" id="tab-reply" aria-selected="false" data-tab="reply">Log a reply</button>
+      <button role="tab" id="tab-leads" aria-selected="false" data-tab="leads">Leads<span class="count" id="c-leads"></span></button>
+      <button role="tab" id="tab-progress" aria-selected="false" data-tab="progress">Progress</button>
+    </nav>
+  </header>
+
+  <div id="banner" hidden></div>
+
+  <section id="panel-today" role="tabpanel">
+    <div class="empty" id="first-empty">Your contacts come in from HighLevel: the trades with a mobile and no email address. Once they're here, today's follow-ups show first, then new people, up to your daily limit.</div>
+  </section>
+
+  <section id="panel-reply" role="tabpanel" hidden>
+    <p class="note">Someone answered on WhatsApp? Find them by name or number and log what they said. It goes into HighLevel at the next sync.</p>
+    <input type="search" id="find" placeholder="Name, business or number" autocomplete="off">
+    <div id="find-results" style="display:grid;gap:12px"></div>
+  </section>
+
+  <section id="panel-leads" role="tabpanel" hidden></section>
+
+  <section id="panel-progress" role="tabpanel" hidden>
+    <div class="stats" id="stats"></div>
+    <h2>Settings</h2>
+    <div class="card">
+      <label for="capInput"><b>Messages a day</b></label>
+      <p class="note" style="margin:0">Keep it between 10 and 20. Sending lots at once from one number is what gets it flagged.</p>
+      <div class="row"><input type="text" id="capInput" inputmode="numeric" style="max-width:90px"><button class="btn" id="saveCap">Save</button></div>
+    </div>
+    <h2>HighLevel sync <small>runs in the cloud, morning and evening</small></h2>
+    <div id="syncLog" class="card"><span class="note">No sync has run yet.</span></div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+const PROJECT = "pnabqurwfloupeskrxbr";
+const SERVER = "Supabase";
+const SIGN = "Colm";
+const LINK_BASE = "https://ringvox.co/trades/hear-it";
+
+let mcp = null, data = null, tab = "today";
+const pending = {};      // contact id -> waiting for "did it send?"
+const openOutcome = {};  // contact id -> outcome panel open
+
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = { get(k, d){ try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+                set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+let cap = store.get("rv-wa-cap", 15);
+
+function toast(t){ const el = $("#toast"); el.textContent = t; el.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => el.hidden = true, 2400); }
+
+// ---------- SQL through the viewer's Supabase connector ----------
+function lit(s){
+  if (s == null) return "null";
+  s = String(s); let tag = "q";
+  while (s.includes("$" + tag + "$")) tag += Math.random().toString(36).slice(2, 5).replace(/[^a-z]/g, "q");
+  return "$" + tag + "$" + s + "$" + tag + "$";
+}
+const uuid = id => { if (!/^[0-9a-f-]{36}$/i.test(id)) throw new Error("bad id"); return "'" + id + "'::uuid"; };
+
+function extractRows(res){
+  let p = res && res.payload;
+  let text = typeof p === "string" ? p : (p && typeof p.result === "string" ? p.result : null);
+  if (text == null && res && res.content) text = (res.content.find(b => b.type === "text") || {}).text;
+  if (text == null) return Array.isArray(p) ? p : [];
+  const m = text.match(/<untrusted-data-[^>]*>\s*([\s\S]*?)\s*<\/untrusted-data/);
+  const body = m ? m[1] : text;
+  try { return JSON.parse(body); } catch { return []; }
+}
+
+async function sql(query){
+  if (!mcp) throw { code: "no_mcp" };
+  const res = await mcp.callTool(SERVER, "execute_sql", { project_id: PROJECT, query }, { cache: false });
+  const rows = extractRows(res);
+  const first = rows && rows[0];
+  return first ? first[Object.keys(first)[0]] : null;
+}
+
+function showError(e, retry){
+  const b = $("#banner"); b.className = "banner err"; b.hidden = false;
+  const code = e && e.code;
+  let msg;
+  if (code === "server_not_connected" || code === "selection_required") msg = "This page reads your contacts through the Supabase connector. Add or pick Supabase in claude.ai Settings → Connectors, then reload.";
+  else if (code === "needs_reauth") msg = "Supabase needs signing in again. Reconnect it in claude.ai Settings → Connectors, then reload.";
+  else if (code === "not_in_manifest" || code === "consent_required") msg = "Supabase isn't allowed for this page yet. Allow it when asked, or turn it on in the page's Permissions menu.";
+  else if (code === "approval_required") msg = "Supabase needs your approval for this step.";
+  else if (code === "no_mcp" || code === "not_granted" || code === "capability_disabled") msg = "This view can't reach your connectors. Open the page from the Claude app or claude.ai while signed in.";
+  else if (code === "tool_error") msg = "The database refused that: " + (e.message || "no reason given") + ".";
+  else if (code === "server_unavailable") msg = "Supabase didn't answer just now. Give it a moment and try again.";
+  else msg = "Something didn't go through" + (e && e.message ? ": " + e.message : "") + ".";
+  b.innerHTML = "<span></span>" + (retry ? '<button class="btn" id="retryBtn">Try again</button>' : "");
+  b.firstChild.textContent = msg;
+  if (retry) $("#retryBtn").onclick = () => { b.hidden = true; retry(); };
+}
+
+// ---------- Messages ----------
+const GENERIC = /^(plumber|plumbers|plumbing|electrician|electricians|electrical|builder|builders|building|emergency|24 ?hour|24hr|locksmith|locksmiths|heating|drain|general|letting|property)\b/i;
+function realBusiness(c){ const n = (c.business_name || "").trim(); return n && !GENERIC.test(n) ? n : ""; }
+function linkFor(c){ const b = realBusiness(c); return b ? LINK_BASE + "?b=" + encodeURIComponent(b).replace(/%20/g, "+") : LINK_BASE; }
+function hi(c){ const f = (c.first_name || "").trim(); return f ? "Hi " + f + "," : "Hi there,"; }
+
+function message(c, step){
+  const b = realBusiness(c), link = linkFor(c);
+  const hear = b ? `I've set one up to answer as ${b}, you can hear it here: ${link}` : `You can hear it answer a call here: ${link}`;
+  if (step === 1 && c.prior_round){
+    return `${hi(c)} Colm from Ringvox again. I messaged you earlier in the year about the AI that answers your phone while you're on a job. It's come on a good bit since, and it now puts every job on a board on your phone too, with quotes and invoices in the same place.\n\n${hear.replace("set one up", "set it up")}\n\nIt's €59 a month, and you get your money back in the first 30 days if it's no use. Any good to you? If not, no bother, just say.\n\n${SIGN}`;
+  }
+  if (step === 1){
+    return `${hi(c)} Colm here from Ringvox in Limerick. When you're up a ladder or under a sink and the phone goes, who answers it?\n\nRingvox does. It answers in a natural Irish voice, takes the caller's details and puts the job on a board on your phone, so you can ring them back when you're free. ${hear}\n\nIt's €59 a month, and if it's no use to you in the first 30 days you get your money back. Would it be any good to you? If not, just say and I'll leave you be.\n\n${SIGN}`;
+  }
+  if (step === 2){
+    return `${hi(c)} Colm again. Just checking my message reached you during the week. Most trades we talk to aren't short of work, they're short of time to answer the phone, and that's the bit Ringvox takes off you. The demo's still there if you want a listen: ${link}`;
+  }
+  return `${hi(c)} last one from me, I won't keep at you. If missed calls aren't a problem for you, that's great. If they are, the link's there whenever you want it: ${link}\n\nAll the best,\n${SIGN}`;
+}
+
+function replies(c){
+  const b = realBusiness(c) || "your business";
+  return [
+    ["Interested: ask for the email", `Brilliant. What's the best email for you? I'll send over the link to get set up, and I can give you a ring to go through it if that suits.`],
+    ["How much is it?", `€59 a month, all in. That's the call answering and the job board, with 100 minutes of calls included and 25c a minute after that. No contract, and if it's no use to you in the first 30 days you get your money back.`],
+    ["How does it work?", `You divert your phone to it when you're busy, or after a few rings. It answers as ${b}, gets the caller's name, number, Eircode and what the job is, and you get it on WhatsApp straight away. The job lands on a board on your phone and you can quote and invoice from there. It takes about 10 minutes to set up and I do it with you.`],
+    ["Set up a call", `Grand, when suits you for a quick call? Ten minutes does it, and I'll show you it working.`],
+    ["Not now", `No problem at all. Would it be alright if I checked back with you in a couple of months?`],
+    ["No thanks", `No bother. Can I ask, just so I know, is it the price or are you not missing many calls? Either way, thanks for coming back to me.`],
+  ];
+}
+
+const wa = (phone, text) => "https://wa.me/" + String(phone).replace(/\D/g, "") + "?text=" + encodeURIComponent(text);
+const dp = p => { p = String(p || ""); return p.startsWith("353") ? "0" + p.slice(3).replace(/^(\d{2})(\d{3})(\d+)/, "$1 $2 $3") : p.startsWith("44") ? "+44 " + p.slice(2) : p; };
+const PRIOR = { round1: "Messaged Feb–Mar", june: "Messaged June" };
+const OUTCOMES = [["interested","Interested"],["not_now","Not now"],["stop","Asked to stop"],["not_on_whatsapp","Not on WhatsApp"],["wrong_number","Wrong number"],["signed_up","Signed up"]];
+const OUT_LABEL = Object.fromEntries(OUTCOMES);
+
+// ---------- Rendering ----------
+function card(c, opts = {}){
+  const step = (c.step || 0) + 1;
+  const sending = opts.queue && step <= 3;
+  const text = sending ? (store.get("rv-wa-draft-" + c.id + "-" + step, null) ?? message(c, step)) : "";
+  const tags = [];
+  if (sending) tags.push(`<span class="tag step">${step === 1 ? "First message" : step === 2 ? "Follow-up" : "Last message"}</span>`);
+  else if (c.step) tags.push(`<span class="tag">${c.step} of 3 sent</span>`);
+  if (c.prior_round) tags.push(`<span class="tag prior">${PRIOR[c.prior_round] || c.prior_round}</span>`);
+  if (c.outcome) tags.push(`<span class="tag ${c.outcome === "interested" || c.outcome === "signed_up" ? "int" : ""}">${OUT_LABEL[c.outcome] || c.outcome}</span>`);
+  const name = c.first_name ? `${esc(c.first_name)} · ${esc(c.business_name || "")}` : esc(c.business_name || dp(c.phone));
+  let web = ""; try { if (c.website) web = ` · <a href="${esc(c.website)}" target="_blank" rel="noopener">${esc(new URL(c.website).hostname.replace(/^www\./, ""))}</a>`; } catch {}
+  return `<article class="card ${opts.done ? "done" : ""}" data-id="${c.id}">
+    <div class="who"><div style="min-width:0"><b>${name}</b>
+      <div class="meta">${esc([c.trade, c.county].filter(Boolean).join(" · "))}${c.trade || c.county ? " · " : ""}<span class="num">${esc(dp(c.phone))}</span>${web}</div></div></div>
+    <div class="tags">${tags.join("")}</div>
+    ${sending ? (pending[c.id] ? `
+      <div class="confirm"><p>Did the message go?</p>
+        <div class="row"><button class="btn primary" data-act="sent">Yes, it's sent</button><button class="btn" data-act="notsent">No, not yet</button></div></div>` : `
+      <textarea id="msg-${c.id}" data-step="${step}" aria-label="Message">${esc(text)}</textarea>
+      <div class="row">
+        <a class="btn wa" data-act="open" href="${esc(wa(c.phone, text))}" target="_blank" rel="noopener">Open in WhatsApp</a>
+        <button class="btn quiet" data-act="skip">Skip</button>
+        <button class="btn quiet" data-act="outcome">They replied</button>
+      </div>`) : ""}
+    ${opts.undo ? `<div class="row"><span class="note">Sent ${esc(fmtTime(c.last_sent_at))}</span><button class="btn quiet" data-act="undo">Undo</button></div>` : ""}
+    ${!sending || openOutcome[c.id] ? outcomeBlock(c, sending) : ""}
+  </article>`;
+}
+
+function outcomeBlock(c, collapsible){
+  return `<div class="outcomes" role="group" aria-label="What did they say?">
+      ${OUTCOMES.map(([k, l]) => `<button class="btn" data-act="set" data-o="${k}" aria-pressed="${c.outcome === k}">${l}</button>`).join("")}
+    </div>
+    <div class="row"><input type="email" id="email-${c.id}" placeholder="Their email, if they gave it" value="${esc(c.email || "")}"></div>
+    <textarea id="notes-${c.id}" style="min-height:70px" placeholder="Notes: what they said, when to ring">${esc(c.notes || "")}</textarea>
+    <div class="row"><button class="btn primary" data-act="save">Save email and notes</button></div>
+    <details><summary>Reply templates</summary><div class="tpl">
+      ${replies(c).map(([l, t], i) => `<b style="font-size:.85rem">${esc(l)}</b><div class="msg">${esc(t)}</div>
+        <div class="row"><a class="btn wa" style="flex:0 1 auto" href="${esc(wa(c.phone, t))}" target="_blank" rel="noopener">Reply in WhatsApp</a><button class="btn" data-act="copy" data-i="${i}">Copy</button></div>`).join("")}
+    </div></details>`;
+}
+
+const fmtTime = t => { if (!t) return ""; const d = new Date(t); return d.toLocaleString("en-IE", { weekday: "short", hour: "2-digit", minute: "2-digit" }); };
+
+function render(){
+  if (!data) return;
+  const sentToday = data.sent_today || 0;
+  $("#today").textContent = new Date(data.today + "T12:00:00").toLocaleDateString("en-IE", { weekday: "long", day: "numeric", month: "long" });
+  $("#sentToday").textContent = sentToday; $("#cap").textContent = cap;
+  $("#bar").classList.toggle("over", sentToday > cap);
+  $("#bar i").style.width = Math.min(100, sentToday / Math.max(cap, 1) * 100) + "%";
+  const due = data.followups.length, fresh = data.new.length;
+  $("#c-today").textContent = due + fresh ? String(due + fresh) : "";
+  $("#c-leads").textContent = data.replies.length ? String(data.replies.length) : "";
+
+  // Today
+  const p = $("#panel-today"); let h = "";
+  const anyContacts = data.stats.queue + data.stats.messaged > 0;
+  if (!anyContacts){
+    h = `<div class="empty">Your contacts come in from HighLevel: the trades with a mobile and no email address. The cloud sync loads them, then today's follow-ups show first and new people after, up to your daily limit.</div>`;
+  } else {
+    h += `<h2>Follow-ups due <small>${due ? due + " to send" : "none today"}</small></h2>`;
+    h += due ? data.followups.map(c => card(c, { queue: true })).join("") : `<div class="empty">Nobody's due a follow-up today.</div>`;
+    h += `<h2>New people <small>${fresh} today · ${data.stats.queue} waiting</small></h2>`;
+    if (fresh) h += data.new.map(c => card(c, { queue: true })).join("");
+    else h += `<div class="empty">${sentToday >= cap ? "That's today's limit reached. Good stuff. More tomorrow." : "Nobody left in the queue."}</div>`;
+    if (justSent.length) h += `<h2>Sent this session</h2>` + justSent.map(c => card(c, { done: true, undo: true })).join("");
+  }
+  p.innerHTML = h;
+
+  // Leads
+  const L = $("#panel-leads");
+  L.innerHTML = data.replies.length ? `<p class="note">People who said yes or not now. Interested ones get a call task in HighLevel at the next sync.</p>` + data.replies.map(c => card(c)).join("")
+    : `<div class="empty">When someone replies with interest, log it and they'll show here.</div>`;
+
+  // Progress
+  const s = data.stats;
+  const rate = s.messaged ? Math.round(s.replied / s.messaged * 100) + "%" : "–";
+  $("#stats").innerHTML = [["Waiting to message", s.queue], ["Messaged", s.messaged], ["Sent in last 7 days", s.sent_7d], ["Reply rate", rate],
+    ["Interested", s.interested], ["Not now", s.not_now], ["Signed up", s.signed_up], ["Stopped or bad number", s.stopped]]
+    .map(([k, v]) => `<div class="stat"><div class="v">${esc(v)}</div><div class="k">${esc(k)}</div></div>`).join("");
+  $("#capInput").value = cap;
+}
+
+let justSent = [];
+const findById = id => [...(data?.followups || []), ...(data?.new || []), ...(data?.replies || []), ...justSent, ...foundList].find(c => c.id === id);
+let foundList = [];
+
+async function load(){
+  try {
+    data = await sql(`select outreach.dashboard(${Math.max(1, Math.min(40, parseInt(cap) || 15))})`);
+    if (!data) throw { message: "no data came back" };
+    $("#banner").hidden = true;
+    render();
+    loadSync();
+  } catch (e) { showError(e, load); }
+}
+
+async function loadSync(){
+  try {
+    const runs = await sql(`select outreach.last_sync()`) || [];
+    const el = $("#syncLog");
+    if (!runs.length) { el.innerHTML = `<span class="note">No sync has run yet. Until it does, what you log here stays in the database and reaches HighLevel at the first run.</span>`; return; }
+    const age = (Date.now() - new Date(runs[0].at)) / 36e5;
+    el.innerHTML = runs.map(r => `<div><span class="sync ${age > 26 ? "stale" : ""}">${esc(fmtTime(r.at))} · ${r.direction === "import" ? "HighLevel → here" : "here → HighLevel"}${r.ok ? "" : " · had problems"}</span><div class="note">${esc(r.summary || "")}</div></div>`).join("");
+  } catch { /* the sync log is a nice-to-have */ }
+}
+
+// ---------- Actions ----------
+async function act(id, query, okText){
+  try { const c = await sql(query); if (okText) toast(okText); return c; }
+  catch (e) { showError(e); return null; }
+}
+
+document.addEventListener("click", async ev => {
+  const t = ev.target.closest("[data-act]"); if (!t) return;
+  const cardEl = t.closest("[data-id]"); const id = cardEl && cardEl.dataset.id; const c = id && findById(id);
+  const a = t.dataset.act;
+  if (a === "open"){ // let the link open WhatsApp, then ask whether it went
+    const ta = $("#msg-" + id); if (ta) t.href = wa(c.phone, ta.value);
+    setTimeout(() => { pending[id] = true; render(); }, 300);
+    return;
+  }
+  if (a === "notsent"){ delete pending[id]; render(); return; }
+  if (a === "sent"){
+    t.disabled = true;
+    const r = await act(id, `select outreach.mark_sent(${uuid(id)})`, "Logged as sent");
+    if (r){ delete pending[id]; store.set("rv-wa-draft-" + id + "-" + r.step, null); justSent.unshift(r); await load(); }
+    else t.disabled = false;
+    return;
+  }
+  if (a === "undo"){
+    const r = await act(id, `select outreach.undo_sent(${uuid(id)})`, "Undone");
+    if (r){ justSent = justSent.filter(x => x.id !== id); await load(); }
+    return;
+  }
+  if (a === "skip"){
+    cardEl.querySelector(".row").outerHTML = `<div class="row" role="group" aria-label="Why skip?">
+      <button class="btn" data-act="skipwhy" data-r="not a trade">Not a trade</button>
+      <button class="btn" data-act="skipwhy" data-r="duplicate">Duplicate</button>
+      <button class="btn" data-act="skipwhy" data-r="knows me already">Knows me already</button>
+      <button class="btn quiet" data-act="notsent">Cancel</button></div>`;
+    return;
+  }
+  if (a === "skipwhy"){
+    const r = await act(id, `select outreach.skip(${uuid(id)}, ${lit(t.dataset.r)})`, "Skipped");
+    if (r) await load();
+    return;
+  }
+  if (a === "outcome"){ openOutcome[id] = !openOutcome[id]; render(); return; }
+  if (a === "set"){
+    const o = t.getAttribute("aria-pressed") === "true" ? "" : t.dataset.o;
+    const r = await act(id, `select outreach.set_outcome(${uuid(id)}, ${lit(o)})`, o ? "Logged: " + OUT_LABEL[o] : "Cleared");
+    if (r){ Object.assign(c, r); foundList = foundList.map(x => x.id === id ? r : x); delete openOutcome[id]; await load(); renderFound(); }
+    return;
+  }
+  if (a === "save"){
+    const email = $("#email-" + id).value.trim(), notes = $("#notes-" + id).value;
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast("That email doesn't look right"); return; }
+    const r = await act(id, `select outreach.save_details(${uuid(id)}, ${lit(email)}, ${lit(notes)})`, "Saved");
+    if (r){ Object.assign(c, r); await load(); renderFound(); }
+    return;
+  }
+  if (a === "copy"){
+    const text = replies(c)[+t.dataset.i][1];
+    try { await navigator.clipboard.writeText(text); toast("Copied"); }
+    catch { const m = t.closest(".row").previousElementSibling; const r = document.createRange(); r.selectNodeContents(m); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast("Selected: copy it from there"); }
+  }
+});
+
+document.addEventListener("input", ev => {
+  const ta = ev.target; if (!ta.id || !ta.id.startsWith("msg-")) return;
+  const id = ta.id.slice(4); const c = findById(id); if (!c) return;
+  const step = +ta.dataset.step;
+  store.set("rv-wa-draft-" + id + "-" + step, ta.value === message(c, step) ? null : ta.value);
+  const link = ta.closest(".card").querySelector('[data-act="open"]'); if (link) link.href = wa(c.phone, ta.value);
+});
+
+// Tabs
+document.querySelectorAll("nav [data-tab]").forEach(b => b.onclick = () => {
+  tab = b.dataset.tab;
+  document.querySelectorAll("nav [data-tab]").forEach(x => x.setAttribute("aria-selected", x === b));
+  ["today","reply","leads","progress"].forEach(k => $("#panel-" + k).hidden = k !== tab);
+  if (tab === "reply") $("#find").focus();
+});
+
+// Find
+let findT;
+$("#find").addEventListener("input", e => { clearTimeout(findT); findT = setTimeout(() => find(e.target.value), 350); });
+async function find(q){
+  if (q.trim().length < 2){ foundList = []; renderFound(); return; }
+  try { foundList = await sql(`select outreach.find(${lit(q)})`) || []; renderFound(); }
+  catch (e) { showError(e); }
+}
+function renderFound(){
+  const el = $("#find-results");
+  const q = $("#find").value.trim();
+  el.innerHTML = foundList.length ? foundList.map(c => card(c)).join("") : (q.length >= 2 ? `<div class="empty">Nobody matches "${esc(q)}".</div>` : "");
+}
+
+$("#saveCap").onclick = () => { const n = parseInt($("#capInput").value); if (!(n >= 1 && n <= 40)) { toast("Pick a number from 1 to 40"); return; } cap = n; store.set("rv-wa-cap", n); toast("Saved"); load(); };
+
+// Boot
+(async () => {
+  try { mcp = window.claude ? await window.claude.use("mcp") : null; } catch { mcp = null; }
+  if (!mcp){ showError({ code: "no_mcp" }); return; }
+  load();
+})();
+})();
+</script>

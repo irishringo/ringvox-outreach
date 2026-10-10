@@ -1,5 +1,9 @@
 # Ringvox WhatsApp outreach sync (scheduled task prompt)
 
+**Live routine (10 Oct 2026): "Ringvox WhatsApp sync (Ringvox env)", trig_015kG83UxNGtjs7tknu4SFhR, created in the Claude Code Routines page with the Ringvox environment, Sonnet 5.5, 06:47 and 18:47 UTC.** It replaced trig_01P1KqL6w21EtRgE6YLEJWmG, which lost the Ringvox environment when its model was changed through the API (disabled, not deleted). Edit this routine in the app (Routines, the routine, Edit), not through the API. The database is reached through the Supabase connector (the Supabase Management secret in the environment has no database permission).
+
+Parts 3 and 4 below were added to the live routine on 10 Oct.
+
 Runs in the **Ringvox** cloud environment, twice a day. Keeps HighLevel (the CRM, master record of contacts) and the WhatsApp outreach page's database (Ringvox Supabase, schema `outreach`) in step. Read-only towards everything except the two writes described. Never print credentials. British English in anything written.
 
 ## Access (all through the environment's proxy, send no auth of your own)
@@ -44,3 +48,12 @@ Insert one row into `outreach.sync_runs` with direction 'push' and a one-line su
 
 ## Finish
 Write nothing else. No messages to contacts, ever: this task only moves data between the two systems. End with a three-line summary.
+
+## Part 3: email reply check (every run)
+Since = newest outreach.sync_runs row with direction 'reply-check' (or 7 days ago). Read HighLevel conversations for trades contacts with an inbound email since then, plus colm@ringvox.co in Zoho Mail (token refresh at accounts.zoho.eu with only grant_type=refresh_token, then mail.zoho.eu, account 747760000000002002). Classify the newest inbound message: interested, question, not now, stop, out of office, bounce, other.
+- interested / question: tags replied, email-interested; stage Replied / Interested; task "Ring {name}: replied to the email" due today; note with the message and a suggested reply in Colm's voice (never sent).
+- not now: tags replied, not-now; stage Not now. stop: tag do-not-contact; stage Lost / Unsubscribed. out of office: note. bounce: tag email-bounced, note, and clear the email in outreach.wa_contacts so a mobile-only contact goes back to the WhatsApp lane. other: note.
+- Insert a sync_runs row direction 'reply-check'; anyone interested is named in the run's summary so the notification shows them.
+
+## Part 4: one-off email search (only until a sync_runs row direction 'email-finder' with ok = true exists)
+Budget 600 Outscraper lookups. Website, then Facebook page, then Google Places to find a website. Junk filter as in task 200. Found: HighLevel email + tags email-found, email-pass2 (and in-wa-sequence if already WhatsApped); outreach.wa_contacts email set. Every contact tried tagged email-search-done. Report: Dropbox ringvox-outreach/email-finder-<date>.md and .csv.

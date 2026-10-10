@@ -231,7 +231,7 @@ function message(c, step){
     return `${hi(c)} Colm here from Ringvox in Limerick. We do two things for trades: we answer your phone when you can't, and we give you one place to run every job, from the first call to getting paid.\n\nThe call lands on a job board on your phone with the caller's details, and you quote it, book it in and invoice it from there. ${hear}\n\nIt's €59 a month for the lot, no per-user fees, and if it's no use to you in the first 30 days you get your money back. Would it be any good to you? If not, just say and I'll leave you be.\n\n${SIGN}`;
   }
   if (step === 2){
-    return `${hi(c)} Colm again. Just checking my message reached you. Most trades we talk to are running jobs out of a notebook, a WhatsApp thread and a separate app for invoices. Ringvox puts it all on one board, from the first call to getting paid, and you can try the board yourself here: https://ringvox.co/trades`;
+    return `${hi(c)} Colm again. Just checking my message reached you. Most trades we talk to are running jobs out of a notebook, a WhatsApp thread and a separate app for invoices. Ringvox puts it all on one board, from the first call to getting paid, and you can try the board yourself here: https://ringvox.co/trades#job-management`;
   }
   return `${hi(c)} last one from me, I won't keep at you. If missed calls aren't a problem for you, that's great. If they are, the link's there whenever you want it: ${link}\n\nAll the best,\n${SIGN}`;
 }
@@ -242,7 +242,7 @@ function replies(c){
     ["Interested: ask for the email", `Brilliant. What's the best email for you? I'll send over the link to get set up, and I can give you a ring to go through it if that suits.`],
     ["How much is it?", `€59 a month, all in. That's the call answering and the job board, with 100 minutes of calls included and 25c a minute after that. No per-user fees, no contract, and if it's no use to you in the first 30 days you get your money back.`],
     ["How does it work?", `You divert your phone to it when you're busy, or after a few rings. It answers as ${b}, gets the caller's name, number, Eircode and what the job is, and you get it on WhatsApp straight away. The job lands on a board on your phone and you can quote and invoice from there. It takes about 10 minutes to set up and I do it with you.`],
-    ["What's the job board?", `It's where every job lives, from the first call to getting paid. You move each one along from enquiry to quoted, booked, done and paid, with the calendar, a route planner and your team on the same screen, and there's an app for the van. Quotes and invoices go out from it too. No per-user fees, so the whole crew can use it. You can have a go on it here: https://ringvox.co/trades`],
+    ["What's the job board?", `It's where every job lives, from the first call to getting paid. You move each one along from enquiry to quoted, booked, done and paid, with the calendar, a route planner and your team on the same screen, and there's an app for the van. Quotes and invoices go out from it too. No per-user fees, so the whole crew can use it. You can have a go on it here: https://ringvox.co/trades#job-management`],
     ["Set up a call", `Grand, when suits you for a quick call? Ten minutes does it, and I'll show you it working.`],
     ["Not now", `No problem at all. Would it be alright if I checked back with you in a couple of months?`],
     ["No thanks", `No bother. Can I ask, just so I know, is it the price or are you not missing many calls? Either way, thanks for coming back to me.`],
